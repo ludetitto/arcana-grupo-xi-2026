@@ -17,7 +17,7 @@ alias:
 - Propiedades clave: orden, acotamiento, restricciones sobre elementos, estabilidad, etc.
 
 ### Representación
-- Descripción de la organización interna (arrays, nodos enlazados, árboles, tablas, etc.).
+Se utiliza una estructura Arbol compuesta de un puntero al nodo raíz. Este nodo raíz contiene un arreglo de claves y un arreglo de punteros a sus hijos.
 - Ilustración sugerida: incluye aquí un diagrama ASCII o referencia a una imagen en `attachments/`.
 
 Debe responder a: "¿qué estoy mirando?"
@@ -41,17 +41,110 @@ Debe responder a: "¿qué puedo hacer y cuánto cuesta?"
 ## 3. Implementación
 
 ### Idea de implementación
-- Descripción de la(s) estrategia(s) típica(s) para implementar la estructura.
-- Algoritmos clave y pasos principales.
+Mantener un árbol no binario dónde sus claves estén ordenadas. Se usan dos estructuras de datos; Arbol para contener la raíz y Nodo para contener claves, información y referencia a hijos.
 
 ### Invariantes
-- Lista de comprobaciones e invariantes que el código debe garantizar siempre (por ejemplo: punteros no nulos, tamaño consistente, heap property, ordenamiento mantenido).
+- El puntero a la raíz nunca es nulo.
+- Cada nodo tiene un número mínimo y máximo de claves que depende del orden del árbol.
+- Después de insertar, el arbol debe dividirse en dos nodos si se excede el número máximo de claves.
+- Despues de eliminar, el arbol debe fusionarse con otro nodo si no alcanza el mínimo de hijos.
+- No acceder a hijos si el nodo es hoja.
 
 ### Ejemplo de código
-- Proporciona 1-2 snippets claros y mínimos (en Python).
-- Ejemplo de uso típico con entrada y salida esperada.
+```python
+class Nodo:
+    def __init__(self):
+        self.claves: list = []
+        self.hijos: list["Nodo"] = []
 
-Debe responder a: "¿cómo lo programo sin romperlo?"
+
+class BTree:
+    def __init__(self, orden=5):
+        if orden < 3:
+            raise ValueError("El orden debe ser mayor o igual que 3")
+
+        self.orden = orden
+        self.maximo_claves = orden - 1
+        self.minimo_claves = (orden + 1) // 2 - 1 - 1
+        self.raiz = Nodo()
+
+    def posicion(a, x):
+      izq, der = 0, len(a)
+
+      while izq < der:
+          medio = (izq + der) // 2
+
+          if a[medio] < x:
+              izq = medio + 1
+          else:
+              der = medio
+
+      return izq
+
+    def buscar(self, clave, nodo=None):
+        if nodo is None:
+            nodo = self.raiz
+
+        indice = posicion(nodo.claves, clave)
+        if indice < len(nodo.claves) and nodo.claves[indice] == clave:
+            return nodo
+        if nodo.hoja:
+            return None
+        return self.buscar(clave, nodo.hijos[indice])
+
+    def insertar(self, clave):
+        if self.buscar(clave) is not None:
+            return False
+
+        division = self._insertar(self.raiz, clave)
+        if division is not None:
+            clave_media, nodo_derecho = division
+            nodo_derecho = Nodo()
+            nodo_derecho.claves = [clave_media]
+            nodo_derecho.hijos = [self.raiz, nodo_derecho]
+            self.raiz = nodo_derecho
+        return True
+
+    def _insertar(self, nodo, clave):
+        indice = posicion(nodo.claves, clave)
+
+        if nodo.hoja:
+            nodo.claves.insert(indice, clave)
+        else:
+            division = self._insertar(nodo.hijos[indice], clave)
+            if division is not None:
+                clave_media, nodo_derecho = division
+                nodo.claves.insert(indice, clave_media)
+                nodo.hijos.insert(indice + 1, nodo_derecho)
+
+        if len(nodo.claves) > self.maximo_claves:
+            return self._dividir(nodo)
+        return None
+
+    def _dividir(self, nodo):
+        medio = len(nodo.claves) // 2
+        clave_media = nodo.claves[medio]
+        nodo_derecho = Nodo()
+
+        nodo_derecho.claves = nodo.claves[medio + 1 :]
+        nodo.claves = nodo.claves[:medio]
+
+        if not nodo.hoja:
+            nodo_derecho.hijos = nodo.hijos[medio + 1 :]
+            nodo.hijos = nodo.hijos[: medio + 1]
+
+        return clave_media, nodo_derecho
+  ```
+
+- Ejemplo de uso típico
+```python
+btree = BTree(orden=3)
+btree.insertar(10)
+btree.insertar(20)
+btree.insertar(5)
+btree.insertar(6)
+print(btree.buscar(10))  # Devuelve el nodo que contiene la clave 10
+```
 
 ## 4. Uso y criterio
 
@@ -86,5 +179,5 @@ Debe responder a: "¿cuándo conviene usarlo?"
 Debe responder a: "¿cómo encaja en el mapa general de estructuras de datos?"
 
 ## 6. Referencias y recursos
-- Enlaces y libros de referencia, artículos científicos.
+- B-Trees. (s/f). Umich.edu. Recuperado el 3 de septiembre de 2026, de https://www.eecs.umich.edu/courses/eecs380/ALG/niemann/s_btr.htm
 - Visualizaciones y demostraciones.
