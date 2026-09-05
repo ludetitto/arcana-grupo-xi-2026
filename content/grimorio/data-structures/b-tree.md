@@ -25,18 +25,36 @@ Debe responder a: "¿qué estoy mirando?"
 ## 2. Operaciones y complejidad
 
 ### Operaciones principales
-- Lista de operaciones con nombres estandarizados (por ejemplo: push/pop/peek, insert/delete/find, append/concat, union/intersect).
-- Para cada operación: breve descripción de lo que hace.
+
+- `find`: Comienza en la raíz. Compara la clave buscada con las claves del nodo actual. Si hay coincidencia, retorna el valor. Si no, desciende al hijo cuyo rango contenga la clave buscada.
+- `insert`: Añade una nueva clave en el nivel de las hojas. Para evitar problemas de balanceo ascendente, a medida que desciende por el árbol buscando dónde insertar, divide preventivamente ("split") cualquier nodo que esté completamente lleno.
+- `delete`: Remueve una clave. Si la clave está en un nodo interno, se reemplaza por su predecesor o sucesor lógico. Si la eliminación deja a un nodo con menos claves del mínimo permitido, se rebalancea pidiendo una clave prestada a un hermano adyacente o fusionándose ("merge") con él. 
+- `traverse`: Visita todas las claves del árbol de forma secuencial y ordenada (in-order). Recorre recursivamente los hijos izquierdos, luego las claves del nodo, y finalmente los hijos derechos.
 
 ### Complejidad
-- Por operación: tiempo (peor/ promedio/ amortizado) y complejidad espacial adicional.
-- Notas sobre costos ocultos (reallocs, rehash, recorridos, copias).
+
+| Operación | Tiempo Promedio | Tiempo Peor Caso | Espacio Adicional |
+| :--- | :--- | :--- | :--- |
+| `find` | $O(\log n)$ | $O(\log n)$ | $O(1)$ |
+| `insert` | $O(\log n)$ | $O(\log n)$ | $O(1)$ |
+| `delete` | $O(\log n)$ | $O(\log n)$ | $O(1)$ |
+| `traverse` | $O(n)$ | $O(n)$ | $O(\log n)$ (por la pila de llamadas) |
+
+### Costos ocultos
+*   **Operaciones de E/S (Disco):** La métrica de rendimiento real de un árbol B no es solo el uso de CPU, sino cuántos bloques de disco debe leer. Gracias a que cada nodo coincide con el tamaño de una página de disco (por ejemplo, 4KB u 8KB), la altura del árbol es muy baja, minimizando los accesos físicos.
+*   **Gestión de memoria (Splits/Merges):** Insertar o eliminar elementos puede desencadenar una cascada de divisiones (splits) o fusiones (merges) de nodos que sube hasta la raíz. Esto implica reasignación de memoria (`reallocs`) y copiado masivo de arrays de claves y punteros dentro del nodo.
+*   **Búsqueda intra-nodo:** Una vez que se carga un nodo en memoria, el algoritmo debe encontrar la clave correcta dentro de ese nodo (que puede tener cientos de claves). Esto agrega un costo de $O(\log m)$ por nivel si se usa búsqueda binaria internamente, aunque se considera una constante amortizada frente al costo de disco.
 
 ### Detalles operativos
-- Casos especiales: operaciones en estructura vacía/llena, duplicados, orden, límites de tamaño.
-- Comportamiento en concurrencia o fallos (si aplica).
+### Casos especiales
+*   **Estructura vacía:** Un `find` retorna un fallo de inmediato. Un `insert` crea el nodo raíz (que en este punto es también la única hoja) y coloca la clave allí.
+*   **Estructura llena (Límites de tamaño):** Un nodo está "lleno" cuando alcanza (m-1) claves, siendo m el orden del árbol. Si el nodo raíz se llena y se necesita hacer un `split`, la raíz se divide en dos y se crea una nueva raíz por encima de ellas. Es el único momento en el que el árbol B aumenta su altura.
+*   **Duplicados:** El árbol B clásico requiere claves únicas. Si se necesitan almacenar duplicados, el algoritmo se modifica para que cada clave apunte a una lista/array de valores, o se anexa un identificador único oculto a cada clave para forzar la unicidad.
+*   **Orden:** A diferencia de una tabla hash, el árbol B mantiene las claves estrictamente ordenadas. Esto lo hace ideal para consultas de rangos (ej. `SELECT * FROM tabla WHERE edad BETWEEN 20 AND 30`).
 
-Debe responder a: "¿qué puedo hacer y cuánto cuesta?"
+### Comportamiento en concurrencia y fallos
+*   **Concurrencia:** Permitir que múltiples hilos lean y escriban simultáneamente en un árbol B es muy complejo, ya que un `split` o `merge` altera la estructura de los punteros, invalidando los caminos de lectura de otros hilos. Se utilizan protocolos estrictos de *latching* (bloqueos temporales) conocidos como "hand-over-hand locking" o variantes estructurales como el **B-link tree** (que añade punteros laterales entre nodos hermanos para mitigar cuellos de botella en la raíz).
+*   **Tolerancia a fallos:** Si un sistema colapsa en medio de un `split` de un nodo, el árbol quedará corrupto y los datos inaccesibles. Por esto, en los motores de bases de datos, cualquier modificación al árbol B se escribe primero de forma secuencial en un registro de transacciones (Write-Ahead Log) antes de tocar el árbol físico.
 
 ## 3. Implementación
 
