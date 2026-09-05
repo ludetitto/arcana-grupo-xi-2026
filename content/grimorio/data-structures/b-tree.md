@@ -25,14 +25,12 @@ Debe responder a: "¿qué estoy mirando?"
 ## 2. Operaciones y complejidad
 
 ### Operaciones principales
-
 - `find`: Comienza en la raíz. Compara la clave buscada con las claves del nodo actual. Si hay coincidencia, retorna el valor. Si no, desciende al hijo cuyo rango contenga la clave buscada.
 - `insert`: Añade una nueva clave en el nivel de las hojas. Para evitar problemas de balanceo ascendente, a medida que desciende por el árbol buscando dónde insertar, divide preventivamente ("split") cualquier nodo que esté completamente lleno.
 - `delete`: Remueve una clave. Si la clave está en un nodo interno, se reemplaza por su predecesor o sucesor lógico. Si la eliminación deja a un nodo con menos claves del mínimo permitido, se rebalancea pidiendo una clave prestada a un hermano adyacente o fusionándose ("merge") con él. 
 - `traverse`: Visita todas las claves del árbol de forma secuencial y ordenada (in-order). Recorre recursivamente los hijos izquierdos, luego las claves del nodo, y finalmente los hijos derechos.
 
 ### Complejidad
-
 | Operación | Tiempo Promedio | Tiempo Peor Caso | Espacio Adicional |
 | :--- | :--- | :--- | :--- |
 | `find` | $O(\log n)$ | $O(\log n)$ | $O(1)$ |
