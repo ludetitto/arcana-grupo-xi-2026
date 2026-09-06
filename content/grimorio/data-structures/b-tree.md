@@ -9,19 +9,19 @@ alias:
 ## 1. Qué es y cómo funciona
 
 ### Intuición
-- Idea central: ¿Cuál es la idea simple detrás de esta estructura?
-- Problema que resuelve: ¿Qué tipo de problema hace sencillo o eficiente?
+Un **árbol B (B-tree)** es un árbol de búsqueda balanceado en el que cada nodo puede guardar varias claves ordenadas y tener varios hijos, en vez de una sola clave y dos hijos como en un árbol binario. Resuelve el problema de que, con muchos datos, un árbol binario necesita demasiados pasos (demasiados nodos) para llegar a cualquier dato (algo carísimo cuando cada nodo vive en el disco por ejemplo).
 
 ### Definición / propiedades
-- Definición formal: invariantes y reglas que siempre se cumplen.
-- Propiedades clave: orden, acotamiento, restricciones sobre elementos, estabilidad, etc.
+Un B-Tree de grado M $\ge$ 3 cumple:
+- Cada nodo tiene como máximo M hijos y M−1 claves. Salvo la raíz, como mínimo M/2 hijos y (M/2)-1 claves.
+- Un nodo interno con k claves tiene exactamente k+1 hijos.
+- Las claves de un nodo están ordenadas y separan los rangos de los subárboles. El hijo i contiene solo claves entre `keys[i-1]` y `keys[i]`.
+- **Todas las hojas están al mismo nivel** (invariante clave: el árbol siempre está perfectamente balanceado en altura).
 
 ### Representación
-- Descripción de la organización interna (arrays, nodos enlazados, árboles, tablas, etc.).
-- Ilustración sugerida: incluye aquí un diagrama ASCII o referencia a una imagen en `attachments/`.
+Cada nodo guarda un arreglo de claves ordenadas, un arreglo de punteros a hijos (uno más que la cantidad de claves) y un flag de si es hoja.
 
-Debe responder a: "¿qué estoy mirando?"
-
+![Diagrama de un B-Tree de grado 4, con raíz de dos claves y tres hojas|254](/attachments/grimorio/data-structures/b-tree.svg)
 ## 2. Operaciones y complejidad
 
 ### Operaciones principales
