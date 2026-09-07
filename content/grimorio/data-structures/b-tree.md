@@ -30,7 +30,11 @@ Debe responder a: "¿qué estoy mirando?"
 
 ### Complejidad
 - Por operación: tiempo (peor/ promedio/ amortizado) y complejidad espacial adicional.
-- Notas sobre costos ocultos (reallocs, rehash, recorridos, copias).
+
+En el mejor de los casos, su altura será $$\log_{M}n$$
+mientras que en el peor de los casos será $$n$$
+
+con M el orden del árbol y n la cantidad de elementos.
 
 ### Detalles operativos
 - Casos especiales: operaciones en estructura vacía/llena, duplicados, orden, límites de tamaño.
@@ -138,11 +142,22 @@ class BTree:
 
 - Ejemplo de uso típico
 ```python
+# Suponiendo que tenemos que cargar en memoria los índices de los registros de una base de datos, utilizamos un B-Tree
 btree = BTree(orden=3)
 btree.insertar(10)
+# [10]
+
 btree.insertar(20)
+# [10, 20]
+
 btree.insertar(5)
+# [5, 10, 20]
+
 btree.insertar(6)
+#       [10]
+#    /         \
+# [5, 6]       [20]
+
 print(btree.buscar(10))  # Devuelve el nodo que contiene la clave 10
 ```
 
@@ -168,10 +183,11 @@ Debe responder a: "¿cuándo conviene usarlo?"
 ## 5. Relaciones y extensiones
 
 ### Variantes
-- Variantes y mejoras (por ejemplo: versiones balanceadas, persistentes, acotadas, indexadas, con hashing, etc.).
+Existen variantes de B-Tree, como B+ Tree y B* Tree, cada una con sus propias características y optimizaciones. Por su lado los B+ Tree contienen información únicamente en sus hojas, facilitando la búsqueda secuencial referenciando nodos contiguos.
+Por otro lado, B* mejora la eficiencia de la estructura al dividir los nodos de manera más equitativa.
 
 ### Relación con otras estructuras
-- Dependencias conceptuales y cómo se combina con otras estructuras.
+Al tratarse de un arbol compuesto de nodos, el B-Tree es capaz de almacenar claves e información en arreglos, listas enlazadas, o incluso en otras estructuras de datos como tablas hash.
 
 ### Notas avanzadas
 - Temas avanzados como persistencia, concurrencia, paralelismo, ordenamientos aleatorios, caching, tuning de parámetros.
@@ -180,4 +196,5 @@ Debe responder a: "¿cómo encaja en el mapa general de estructuras de datos?"
 
 ## 6. Referencias y recursos
 - B-Trees. (s/f). Umich.edu. Recuperado el 3 de septiembre de 2026, de https://www.eecs.umich.edu/courses/eecs380/ALG/niemann/s_btr.htm
+- Introduction of B+ tree. (2018, abril 4). GeeksforGeeks. https://www.geeksforgeeks.org/dbms/introduction-of-b-tree/
 - Visualizaciones y demostraciones.
