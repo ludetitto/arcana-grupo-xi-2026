@@ -56,21 +56,36 @@ Debe responder a: "¿cómo lo programo sin romperlo?"
 ## 4. Uso y criterio
 
 ### Casos de uso
-- Situaciones y problemas donde la estructura encaja naturalmente.
+- Índices de bases de datos relacionales, por igualdad y por rango (PostgreSQL lo usa por defecto).
+- Metadatos de filesystems que deben escalar sin perder balance (HFS+ y NTFS).
+- Almacenamiento embebido de pares clave-valor (SQLite implementa sus índices como B-Trees).
+- Datasets que no entran en RAM y requieren acceso ordenado con mínimas lecturas físicas.
 
 ### Cuándo NO usarlo
-- Escenarios donde su uso es contraproducente o subóptimo.
+- Si el dataset entra en memoria, un AVL Tree o Red-Black Tree tiene menor overhead por nodo.
+- Si solo hacen falta búsquedas puntuales sin orden, una [[hash table]] da $O(1)$ promedio.
+- Si predominan las búsquedas por rango secuenciales sobre disco, conviene un B+Tree, no un B-Tree puro.
+- Si el volumen es chico, el balanceo no se justifica frente a un array ordenado.
 
 ### Comparaciones
-- Alternativas comunes y cuándo elegir cada una (lista comparativa breve).
+- **vs Red-Black Tree / AVL Tree:** igual $O(\log n)$ en memoria, pero al tener máximo 2 hijos por nodo necesitan más niveles de altura, disparando los accesos a disco; el B-Tree agrupa claves por nodo para calzar con el tamaño de página física.
+- **vs [[hash table]]:** gana en búsqueda puntual con $O(1)$, pero no soporta recorridos ordenados ni búsquedas por rango.
+- **vs B+Tree:** guarda datos solo en las hojas y las enlaza, optimizando las búsquedas por rango; el B-Tree también guarda datos en nodos internos, ahorrando una búsqueda a veces pero complicando el recorrido. InnoDB usa B+Tree.
 
 ### Ventajas / desventajas
-- Trade-offs prácticos en rendimiento, memoria, simplicidad, y facilidad de implementación.
+| Ventajas | Desventajas |
+| :--- | :--- |
+| Pocos accesos a disco por su altura baja | Implementación más compleja (splits, merges) |
+| Balanceo garantizado en toda operación | Poco eficiente si todo entra en RAM |
+| Algunas búsquedas terminan antes de llegar a una hoja | Búsquedas por rango más lentas que en un B+Tree |
+| Cada nodo aprovecha un bloque completo de disco | Puede desperdiciar espacio en nodos no llenos |
 
 ### Señales de reconocimiento
-- Pistas en el enunciado de un problema que indican que esta estructura es adecuada.
-
-Debe responder a: "¿cuándo conviene usarlo?"
+- "Minimizar accesos a disco"
+- "Índice de base de datos"
+- "Metadatos de un filesystem"
+- "Grandes volúmenes de datos que no entran en memoria"
+- "Cada nodo puede tener múltiples claves e hijos"
 
 ## 5. Relaciones y extensiones
 
