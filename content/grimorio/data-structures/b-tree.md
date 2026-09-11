@@ -9,7 +9,8 @@ alias:
 ## 1. Qué es y cómo funciona
 
 ### Intuición
-Un **árbol B (B-tree)** es un árbol de búsqueda balanceado en el que cada nodo puede guardar varias claves ordenadas y tener varios hijos, en vez de una sola clave y dos hijos como en un árbol binario. Resuelve el problema de que, con muchos datos, un árbol binario necesita demasiados pasos (demasiados nodos) para llegar a cualquier dato (algo carísimo cuando cada nodo vive en el disco por ejemplo).
+Un **árbol B** puede pensarse como las puertas de embarque de un aeropuerto: si tu vuelo sale por la Puerta 2, seguís los carteles principales que dividen la terminal ([Puertas 1-20 | Puertas 21-40 | Puertas 41-60]), vas directo a la Terminal 3 y caminas unos pocos metros hasta el asiento 42, sin tener que pasar por cada puerta desde la 1.
+Este es un árbol de búsqueda balanceado en el que cada nodo puede guardar varias claves ordenadas y tener varios hijos, en vez de una sola clave y dos hijos como en un árbol binario. Resuelve el problema de que, con muchos datos, un árbol binario necesita demasiados nodos para llegar a cualquier dato.
 
 ### Definición / propiedades
 Un B-Tree de grado M $\ge$ 3 cumple:
