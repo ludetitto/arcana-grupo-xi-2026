@@ -15,7 +15,8 @@ Esta estructura resuelve el problema de que, cuando hay muchos datos, un árbol 
 ### Definición / propiedades
 Un B-Tree de grado M $\ge$ 3 cumple:
 - Cada nodo tiene como máximo M hijos y M−1 claves.
-- La raíz tiene como mínimo M/2 hijos y (M/2)-1 claves.
+- Cada nodo interno, ni hoja ni raíz, tiene como mínimo M/2 hijos y (M/2)-1 claves.
+- La raíz es una excepción al mínimo. Puede tener una sola clave y dos hijos, o incluso ser una hoja.
 - Un nodo interno con k claves tiene exactamente k+1 hijos.
 - Las claves de un nodo están ordenadas y separan los rangos de los subárboles. El hijo i contiene solo claves entre `keys[i-1]` y `keys[i]`.
 - **Todas las hojas están al mismo nivel** lo cuál lo hace balanceado.
@@ -45,12 +46,11 @@ Cada nodo guarda un arreglo de claves ordenadas, un arreglo de punteros a hijos 
 *   **Gestión de memoria:** Insertar o eliminar elementos puede desencadenar una cascada de divisiones o fusiones de nodos que sube hasta la raíz. Esto implica reasignación de memoria (`reallocs`).
 *   **Búsqueda intra-nodo:** Una vez que se carga un nodo en memoria, el algoritmo debe encontrar la clave correcta dentro de ese nodo. Esto agrega un costo de $O(\log m)$ por nivel si se usa búsqueda binaria.
 
-### Detalles operativos
 ### Casos especiales
 *   **Estructura vacía:** Un `find` retorna un fallo. Un `insert` crea el nodo raíz y coloca la clave.
 *   **Estructura llena:** Un nodo está "lleno" cuando alcanza (m-1) claves, siendo m el orden del árbol. Si el nodo raíz se llena y se necesita hacer un `split`, la raíz se divide en dos y se crea una nueva raíz por encima de ellas.
 *   **Duplicados:** El árbol B clásico requiere claves únicas. Si se necesitan almacenar duplicados, el algoritmo se modifica para que cada clave apunte a una array de valores.
-*   **Orden:** A diferencia de una [[Hash Table]], el árbol B mantiene las claves estrictamente ordenadas. Esto lo hace ideal para consultas de rangos (ej. `SELECT * FROM tabla WHERE edad BETWEEN 20 AND 30`).
+*   **Orden:** A diferencia de una [[hash table]], el árbol B mantiene las claves estrictamente ordenadas. Esto lo hace ideal para consultas de rangos (ej. `SELECT * FROM tabla WHERE edad BETWEEN 20 AND 30`).
 
 ### Comportamiento en concurrencia y fallos
 *   **Concurrencia:** Permitir que múltiples hilos lean y escriban simultáneamente en un árbol B es muy complejo, ya que un `split` o `merge` altera la estructura de los punteros, invalidando los caminos de lectura de otros hilos. Se utilizan protocolos estrictos de *latching* (bloqueos temporales) conocidos como "hand-over-hand locking" o variantes estructurales como el **B-link tree** (que añade punteros laterales entre nodos hermanos para mitigar cuellos de botella en la raíz).
@@ -76,6 +76,17 @@ class Nodo:
         self.hijos: list["Nodo"] = []
         self.hoja: bool = False
 
+def posicion(a, x):
+    izq, der = 0, len(a)
+
+    while izq < der:
+        medio = (izq + der) // 2
+        if a[medio] < x:
+            izq = medio + 1
+        else:
+            der = medio
+    return izq
+
 class BTree:
     def __init__(self, orden=5):
         if orden < 3:
@@ -85,17 +96,6 @@ class BTree:
         self.minimo_claves = (orden + 1) // 2 - 1 # // 2 significa división entera
         self.raiz = Nodo()
         self.raiz.hoja = True
-
-    def posicion(a, x):
-      izq, der = 0, len(a)
-
-      while izq < der:
-          medio = (izq + der) // 2
-          if a[medio] < x:
-              izq = medio + 1
-          else:
-              der = medio
-      return izq
 
     def buscar(self, clave, nodo=None):
         if nodo is None:
@@ -115,12 +115,11 @@ class BTree:
         division = self._insertar(self.raiz, clave)
         if division is not None:
             clave_media, nodo_derecho = division
-            nodo_derecho.hoja = True
             self.raiz.hoja = False
-            nodo_derecho = Nodo()
-            nodo_derecho.claves = [clave_media]
-            nodo_derecho.hijos = [self.raiz, nodo_derecho]
-            self.raiz = nodo_derecho
+            nueva_raiz = Nodo()
+            nueva_raiz.claves = [clave_media]
+            nueva_raiz.hijos = [self.raiz, nodo_derecho]
+            self.raiz = nueva_raiz
         return True
 
     def _insertar(self, nodo, clave):
@@ -184,13 +183,13 @@ print(btree.buscar(10))  # SELECT * FROM tabla WHERE clave = 10
 
 ### Cuándo NO usarlo
 - Si el dataset entra en memoria, un AVL Tree o Red-Black Tree tiene menor overhead por nodo.
-- Si solo hacen falta búsquedas puntuales sin orden, una [[Hash Table]] da $O(1)$ promedio.
+- Si solo hacen falta búsquedas puntuales sin orden, una [[hash table]] da $O(1)$ promedio.
 - Si predominan las búsquedas por rango secuenciales sobre disco, conviene un B+Tree, no un B-Tree puro.
 - Si el volumen es chico, el balanceo no se justifica frente a un array ordenado.
 
 ### Comparaciones
 - **vs Red-Black Tree / AVL Tree:** igual $O(\log n)$ en memoria, pero al tener máximo 2 hijos por nodo necesitan más niveles de altura, disparando los accesos a disco; el B-Tree agrupa claves por nodo para ajustar al tamaño de página física.
-- **vs [[Hash Table]]:** gana en búsqueda puntual con $O(1)$, pero no soporta recorridos ordenados ni búsquedas por rango.
+- **vs [[hash table]]:** gana en búsqueda puntual con $O(1)$, pero no soporta recorridos ordenados ni búsquedas por rango.
 
 ### Ventajas / desventajas
 | Ventajas | Desventajas |
@@ -214,10 +213,10 @@ Existen variantes de B-Tree, como B+Tree y B*Tree, cada una con sus propias cara
 Por otro lado, B* mejora la eficiencia de la estructura al dividir los nodos de manera más equitativa.
 
 ### Relación con otras estructuras
-Al tratarse de un arbol compuesto de nodos, el B-Tree es capaz de almacenar claves e información en arreglos, [[Linked List]], o incluso en otras estructuras de datos como [[Hash Table]].
+Al tratarse de un arbol compuesto de nodos, el B-Tree es capaz de almacenar claves e información en arreglos, [[linked list]], o incluso en otras estructuras de datos como [[hash table]].
 
 ### Notas avanzadas
-Aleatoriedad: a diferencia de un [[skip list|skip list]] o un treap, el B-Tree es determinista: no depende de decisiones al azar para mantener el balance, sino de las reglas de split/merge.
+Aleatoriedad: a diferencia de un skip list o un treap, el B-Tree es determinista: no depende de decisiones al azar para mantener el balance, sino de las reglas de split/merge.
 
 ## 6. Referencias y recursos
 - B-Trees. (s/f). Umich.edu. Recuperado el 3 de septiembre de 2026, de https://www.eecs.umich.edu/courses/eecs380/ALG/niemann/s_btr.htm
