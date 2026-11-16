@@ -21,9 +21,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Use project Node.js version
+        uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version-file: .node-version
       - name: Run markdownlint (no bloqueante)
         run: |
           # No falla el job: los errores se muestran como warnings inline en el PR.
