@@ -7,13 +7,13 @@ tags:
 
 ## Técnicas utilizadas
 
-Búsqueda por [[fuerza bruta]]: para cada fila y cada columna (índices de 0 a n-1) se decide si se pulsa o no su botón, probando todas las combinaciones posibles de pulsaciones.
+Búsqueda por fuerza bruta: para cada fila y cada columna (índices de 0 a n-1) se decide si se pulsa o no su botón, probando todas las combinaciones posibles de pulsaciones.
 
 ## Idea de la solución
 
-Cada luz depende solo de cuántas veces se presionaron su botón de fila y su botón de columna, así que el orden de las pulsaciones no afecta el resultado. Además, presionar dos veces el mismo botón deja todo como estaba. Por lo tanto, cualquier secuencia de pulsaciones equivale a otra en la que cada botón se presiona a lo sumo una vez, y esta usa igual o menos pulsaciones. Alcanza entonces con decidir, para cada botón, si se presiona (1) o no (0).
+En el [[cubo-de-luces|Cubo de Luces]], cada luz depende solo de cuántas veces se presionaron su botón de fila y su botón de columna, así que el orden de las pulsaciones no afecta el resultado. Además, presionar dos veces el mismo botón deja todo como estaba. Por lo tanto, cualquier secuencia de pulsaciones equivale a otra en la que cada botón se presiona a lo sumo una vez, y esta usa igual o menos pulsaciones. Alcanza entonces con decidir, para cada botón, si se presiona (1) o no (0).
 
-Llamamos $f[i]$ a la decisión sobre la fila i y $c[j]$ a la decisión sobre la columna j, con $0 \le i, j \le n-1$. Como hay $n$ botones de fila y $n$ de columna, existen $2^{2n}$ combinaciones. Cada combinación es un par de listas de $n$ ceros y unos: $f$ para las filas y $c$ para las columnas. Por ejemplo, con $n = 4$, $f = [0, 1, 1, 0]$ significa que se pulsan las filas 1 y 2.
+Llamamos $f[i]$ a la decisión sobre la fila i y $c[j]$ a la decisión sobre la columna j, con $0 \le i, j \le n-1$. Como hay $n$ botones de fila y $n$ de columna, existen $2^{2n}$ combinaciones. Cada combinación es un par de [[array|arreglos]] de $n$ ceros y unos: $f$ para las filas y $c$ para las columnas. Por ejemplo, con $n = 4$, $f = [0, 1, 1, 0]$ significa que se pulsan las filas 1 y 2.
 
 Para cada combinación simulamos las pulsaciones sobre una copia del tablero (matriz_temporal), así el tablero original queda intacto para la combinación siguiente:
 
@@ -164,12 +164,13 @@ Las dos técnicas recorren el mismo espacio de decisiones: cada botón se presio
 | | Fuerza bruta | Backtracking |
 |---|---|---|
 | Cuándo verifica | Al final, con la combinación completa | Durante la construcción, en cada decisión |
-| Candidatos explorados | Siempre $2^{2n}$ | Muchos menos, porque las podas cortan ramas enteras |
-| Tiempo en el peor caso | $O(2^{2n} \cdot n^2)$ | Depende del orden: con un orden poco favorable sigue siendo exponencial; decidiendo primero $f[0]$ y luego las columnas, sobreviven solo 2 ramas y queda $O(n^2)$ |
-| Espacio adicional | $O(n^2)$ por la copia del tablero | $O(n)$ para $f$, $c$ y la pila de recursión |
+| Candidatos explorados | Siempre $2^{2n}$ | A lo sumo 2 ramas completas |
+| Tiempo | $O(2^{2n} \cdot n^2)$ | $O(n^2)$ con el orden elegido (primero $f[0]$, después las columnas y por último las filas) |
+| Espacio adicional | $O(n^2)$ por la copia del tablero | $O(n)$ para $f$, $c$ y la [[stack|pila]] de recursión |
 | Dificultad de implementación | Baja | Media: hay que elegir el orden de los botones y las podas |
+| Sirve para $n \le 1000$ | No | Sí |
 
-En resumen, la fuerza bruta conviene para $n$ chico o como referencia para verificar. Para valores de $n$ más grandes, el backtracking es la mejor opción de las dos, porque evita explorar combinaciones que ya se sabe que fallan.
+En resumen, la fuerza bruta conviene para $n$ chico o como referencia para verificar. El backtracking, con el orden de decisión elegido, resuelve el problema completo hasta $n = 1000$, porque descarta de inmediato las opciones que dejan una luz apagada. Los detalles están en [[cubo-de-luces-backtracking|la solución por backtracking]].
 
 ## Referencias
 - [Problema original (OIA)](https://www.oia.unsam.edu.ar/wp-content/uploads/2021/03/cubo.pdf)
