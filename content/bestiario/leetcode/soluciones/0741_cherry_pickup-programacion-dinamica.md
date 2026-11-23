@@ -22,13 +22,13 @@ La recursión de los **dos recolectores** ya identifica el estado mínimo: `(r1,
 - `c1` ∈ {0 … N-1} → `N` valores
 - `r2` ∈ {0 … N-1} → `N` valores
 
-Su producto da `N × N × N = N^3` combinaciones posibles. La cuarta coordenada, `c2`, **no cuenta**: no es libre, queda determinada por las otras tres (`c2 = r1 + c1 - r2`). Ésa es justamente la ganancia de la [[0741_cherry_pickup]]: si el estado fuera `(r1, c1, r2, c2)` habría `O(N^4)` estados y la tabla (y el tiempo) crecerían un orden más.
+Su producto da `N × N × N = N^3` combinaciones posibles. La cuarta coordenada, `c2`, **no cuenta**: no es libre, queda determinada por las otras tres (`c2 = r1 + c1 - r2`). Ésa es justamente la ganancia de la [[0741_cherry_pickup]]: si el estado fuera `(r1, c1, r2, c2)` habría $O(N^4)$ estados y la tabla (y el tiempo) crecerían un orden más.
 
 `N^3` es una **cota superior**: muchas de esas ternas son inalcanzables (por ejemplo, las que dan `c2` fuera de la grilla, o `r2 > r1 + c1`). Pero como sólo buscamos el orden de crecimiento, alcanza con acotar: los estados **realmente visitados** son a lo sumo `N^3`, y eso ya es polinómico.
 
-La PD ataca el desperdicio de la fuerza bruta, que visita esos mismos `O(N^3)` estados una cantidad **exponencial** de veces porque cada `(r1, c1, r2)` se alcanza por múltiples combinaciones de movimientos previos. La **primera** vez que se resuelve un estado, su resultado se guarda en una tabla de memoización (un [[map]] indexado por `(r1, c1, r2)`); las veces siguientes se devuelve el valor cacheado en `O(1)`. Así, cada estado se computa **una única vez**, transformando el costo de exponencial a polinómico sin alterar el resultado.
+La PD ataca el desperdicio de la fuerza bruta, que visita esos mismos $O(N^3)$ estados una cantidad **exponencial** de veces porque cada `(r1, c1, r2)` se alcanza por múltiples combinaciones de movimientos previos. La **primera** vez que se resuelve un estado, su resultado se guarda en una tabla de memoización (un [[map]] indexado por `(r1, c1, r2)`); las veces siguientes se devuelve el valor cacheado en $O(1)$. Así, cada estado se computa **una única vez**, transformando el costo de exponencial a polinómico sin alterar el resultado.
 
-![Subproblemas superpuestos y memoización](cherry_pickup_subproblemas.svg)
+![Subproblemas superpuestos y memoización](0741-subproblemas.svg)
 
 ### La recurrencia
 
@@ -99,7 +99,7 @@ def cherry_pickup(grid):
 
 La **recursión** (el caso base, las 4 transiciones y el `max`) es la misma que la de la [[0741_cherry_pickup-fuerza-bruta]]: no cambia *qué* se calcula ni el resultado. Pero el **cuerpo no es idéntico**: la PD agrega dos operaciones que la fuerza bruta no tiene: la **consulta** a la memoria antes de computar (paso 3) y la **escritura** del resultado antes de retornar (paso 4). Esas dos líneas son exactamente lo que convierte el algoritmo de inviable a eficiente: sin ellas no hay reutilización de subproblemas y no hay PD.
 
-> En Python, el decorador `@lru_cache(maxsize=None)` sobre `explorar` produce el mismo efecto escondiendo los pasos 1–4 en una sola línea. Lo escribimos con el diccionario a la vista porque el mecanismo (y no el azúcar sintáctico) es el que explica el cambio de complejidad.
+> En Python, el decorador `@lru_cache(maxsize=None)` sobre `explorar` produce el mismo efecto escondiendo los pasos 1–4 en una sola línea. Lo escribimos con el [[map]] a la vista porque el mecanismo (y no el azúcar sintáctico) es el que explica el cambio de complejidad.
 
 ### Traza de ejemplo
 
@@ -112,12 +112,12 @@ Sobre la misma instancia (`N = 3`, respuesta `5`). La rama óptima es la misma q
 | `(1,1,2)` | 0 | no | computa (cerezas `0+1=1`) |
 | `(2,1,2)` | 1 | no | computa (coinciden → `1`) |
 | `(2,2,2)` | 2 | no | caso base → `1` |
-| `(2,1,2)` | 1 | **sí** | devuelve valor cacheado en `O(1)` |
-| `(1,1,2)` | 0 | **sí** | devuelve valor cacheado en `O(1)` |
+| `(2,1,2)` | 1 | **sí** | devuelve valor cacheado en $O(1)$ |
+| `(1,1,2)` | 0 | **sí** | devuelve valor cacheado en $O(1)$ |
 
 Las dos últimas filas muestran el ahorro: estados que la fuerza bruta volvería a expandir por completo, la PD los resuelve consultando la tabla. El valor final propagado a `(0,0,0)` es `5`, y `max(0, 5) = 5`.
 
-![Grilla original y tabla de memoización](cherry_pickup_tabla_pd.svg)
+![Grilla original y tabla de memoización](0741-tabla-pd.svg)
 
 Al igual que en los problemas de tabla 2D vistos en clase, la tabla se llena desde los casos base hacia el objetivo; la diferencia es que acá se indexa por la **terna** `(r1, c1, r2)` y no por una matriz, porque el estado tiene tres coordenadas libres. La celda `(0,0,0)` es la que contiene la respuesta del problema.
 
@@ -130,11 +130,11 @@ $$T = (\text{cantidad de estados distintos}) \times (\text{trabajo por estado})$
 Esta identidad vale **gracias a la memoización**: como cada estado se computa una sola vez, basta contar los estados y ver cuánto cuesta resolver *uno* (sin contar el costo de sus llamadas recursivas, que ya están contabilizadas en sus propios estados). Aplicándola:
 
 - **Cantidad de estados:** $O(N^3)$, por las tres coordenadas libres `(r1, c1, r2)` justificadas más arriba.
-- **Trabajo por estado:** $O(1)$. Al resolver un estado se hace una cantidad **constante** de operaciones: deducir `c2`, chequear límites y espinas, sumar a lo sumo dos celdas, y tomar el `max` de **exactamente 4** valores. Ese 4 es una constante fija (no depende de `N`), y cada una de esas 4 llamadas cuesta `O(1)` porque devuelve un valor ya cacheado o inicia el cómputo de *otro* estado, que se cuenta aparte.
+- **Trabajo por estado:** $O(1)$. Al resolver un estado se hace una cantidad **constante** de operaciones: deducir `c2`, chequear límites y espinas, sumar a lo sumo dos celdas, y tomar el `max` de **exactamente 4** valores. Ese 4 es una constante fija (no depende de `N`), y cada una de esas 4 llamadas cuesta $O(1)$ porque devuelve un valor ya cacheado o inicia el cómputo de *otro* estado, que se cuenta aparte.
 
-- **Temporal:** $O(N^3) \times O(1) = O(N^3)$. Para `N = 50` son a lo sumo `50³ = 125 000` estados, cada uno con trabajo constante: trivial para una computadora.
+- **Temporal:** $O(N^3) \times O(1) = O(N^3)$. Para `N = 50` son a lo sumo $50^3 = 125\,000$ estados, cada uno con trabajo constante: trivial para una computadora.
 
-  Es útil ver **dónde se fue el exponencial**: la fuerza bruta también hace `O(1)` de trabajo por llamada, pero realiza $O(4^{2N})$ **llamadas** porque revisita los mismos estados una y otra vez. La memoización no acelera cada paso; lo que hace es **acotar la cantidad de llamadas que hacen trabajo real** al número de estados distintos. El tiempo deja de depender de la *forma del árbol de recursión* y pasa a depender del *tamaño del espacio de estados*.
+  Es útil ver **dónde se fue el exponencial**: la fuerza bruta también hace $O(1)$ de trabajo por llamada, pero realiza $O(4^{2N})$ **llamadas** porque revisita los mismos estados una y otra vez. La memoización no acelera cada paso; lo que hace es **acotar la cantidad de llamadas que hacen trabajo real** al número de estados distintos. El tiempo deja de depender de la *forma del árbol de recursión* y pasa a depender del *tamaño del espacio de estados*.
 
 - **Espacial:** $O(N^3)$. Domina la tabla de memoización: en el peor caso guarda un valor por cada estado alcanzado. La pila de recursión aporta $O(N)$ (su profundidad es la longitud de un camino, `2(N-1)`), despreciable frente a la tabla. Éste es el precio explícito de la PD: **se compra tiempo pagando memoria**.
 
@@ -146,9 +146,9 @@ Sus **limitaciones**: paga memoria por velocidad (aquí $O(N^3)$, que para `N` m
 
 Comparada con la [[0741_cherry_pickup-fuerza-bruta]], es **estrictamente superior para este problema**: explora **la misma recursión** y llega al mismo resultado, pero al agregarle la memoria pasa de $O(4^{2N})$ a $O(N^3)$ en tiempo, a cambio de subir de $O(N)$ a $O(N^3)$ en memoria. El intercambio es claramente favorable: la memoria crece de forma polinómica mientras que el tiempo que se ahorra era exponencial. La fuerza bruta sólo conviene como referencia conceptual o como oráculo de testing en instancias diminutas; **para resolver el problema de verdad, se usa la PD**.
 
-> Variante: esta versión es *top-down* (memoización). Existe una formulación *bottom-up* equivalente que llena una tabla 3D iterando `t = 0 … 2(N-1)`, con la misma complejidad `O(N^3)` y la ventaja de evitar el límite de profundidad de recursión.
+> Variante: esta versión es *top-down* (memoización). Existe una formulación *bottom-up* equivalente que llena una tabla 3D iterando `t = 0 … 2(N-1)`, con la misma complejidad $O(N^3)$ y la ventaja de evitar el límite de profundidad de recursión.
 
 ### Referencias
 
-- [[COR2011]] - Cap. 15: Dynamic Programming.
+- [[COR2011]] - Chapter 15.
 - Documentación de Python - `functools.lru_cache`: https://docs.python.org/3/library/functools.html#functools.lru_cache

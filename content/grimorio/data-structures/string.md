@@ -25,11 +25,11 @@ Los strings facilitan:
 
 #### Definición formal
 
-Un string es una **secuencia finita de caracteres** pertenecientes a un alfabeto Σ (por ejemplo, ASCII o Unicode):
+Un string es una **secuencia finita de caracteres** pertenecientes a un alfabeto $\Sigma$ (por ejemplo, ASCII o Unicode):
 
-S = c₀ c₁ c₂ ... cₙ₋₁
+$$S = c_0 \, c_1 \, c_2 \, \ldots \, c_{n-1}$$
 
-donde cada cᵢ ∈ Σ.
+donde cada $c_i \in \Sigma$.
 
 #### Invariantes (lo que siempre se cumple)
 
@@ -46,10 +46,10 @@ donde cada cᵢ ∈ Σ.
   `"abc" ≠ "cba"`
 
 - **Indexado:** acceso directo a cualquier posición
-  Ej: S[0] = 'h'
+  Ej: `S[0] = 'h'`
 
 - **Longitud definida:**
-  len("hola") = 4
+  `len("hola") = 4`
 
 - **Puede ser inmutable o mutable:**
   - Inmutable (más común): más seguro, pero puede implicar copias
@@ -66,22 +66,22 @@ La forma más común de representar un string es como un **arreglo (array) conti
 
 Ejemplo: `"hola"`
 
-![Representación en memoria de "hola"](string%20hola%20array.svg)
+![Representación en memoria de "hola"](string-hola-array.svg)
 
 Esto permite:
 
-- Acceso en O(1) por índice
+- Acceso en $O(1)$ por índice
 - Recorrido secuencial eficiente
 
-En lenguajes como C, además, se utiliza un carácter especial de terminación (`'\0'`):
+En lenguajes como C, además, se utiliza un carácter especial de terminación (`\0`):
 
-![Representación en memoria de "hola" con terminador nulo](string%20hola%20null.svg)
+![Representación en memoria de "hola" con terminador nulo](string-hola-null.svg)
 
 #### Ilustración
 
 String: `"chat"`
 
-![Ilustración del string "chat" con índices y contenido](string%20chat.svg)
+![Ilustración del string "chat" con índices y contenido](string-chat.svg)
 
 #### Variantes de representación
 
@@ -126,25 +126,25 @@ Aunque lo más común es un array, también existen otras implementaciones:
 
 ### Complejidad
 
-| Operación       | Tiempo (peor caso)                       | Complejidad Espacial          |
-| --------------- | ---------------------------------------- | ------------------------------|
-| Access          | O(1) ASCII / O(n) UTF-8 sin índice       | O(1)                          |
-| Insert / Delete | O(n)                                     | O(n)                          |
-| Concat          | O(n + m)                                 | O(n + m)                      |
-| Find            | O(n\*m) naive / O(n+m) KMP               | O(1) naive / O(m) KMP         |
-| Length          | O(1) ASCII / O(n) UTF-8 sin índice       | O(1)                          |
-| Compare         | O(n)                                     | O(1)                          |
-| Transform       | O(n)                                     | O(n) inmutable / O(1) mutable |
-| Append          | O(n) inmutable / O(1) amortizado mutable | O(n)                          |
-| Slice           | O(k)                                     | O(k)                          |
+| Operación       | Tiempo (peor caso)                           | Complejidad espacial               |
+| --------------- | --------------------------------------------- | ----------------------------------- |
+| Access          | $O(1)$ ASCII / $O(n)$ UTF-8 sin índice         | $O(1)$                              |
+| Insert / Delete | $O(n)$                                         | $O(n)$                              |
+| Concat          | $O(n + m)$                                     | $O(n + m)$                          |
+| Find            | $O(n \cdot m)$ naive / $O(n+m)$ KMP            | $O(1)$ naive / $O(m)$ KMP           |
+| Length          | $O(1)$ ASCII / $O(n)$ UTF-8 sin índice         | $O(1)$                              |
+| Compare         | $O(n)$                                         | $O(1)$                              |
+| Transform       | $O(n)$                                         | $O(n)$ inmutable / $O(1)$ mutable   |
+| Append          | $O(n)$ inmutable / $O(1)$ amortizado mutable   | $O(n)$                              |
+| Slice           | $O(k)$                                         | $O(k)$                              |
 
 ### Detalles operativos
 
-- **Encoding (UTF-8 vs ASCII):** En ASCII el acceso es siempre O(1). En UTF-8, debido a que los caracteres tienen ancho variable (1 a 4 bytes), el acceso y el cálculo de longitud pueden degradarse a O(n) si el lenguaje no utiliza índices adicionales.
+- **Encoding (UTF-8 vs ASCII):** En ASCII el acceso es siempre $O(1)$. En UTF-8, debido a que los caracteres tienen ancho variable (1 a 4 bytes), el acceso y el cálculo de longitud pueden degradarse a $O(n)$ si el lenguaje no utiliza índices adicionales.
 
-- **Data Locality (Localidad de datos):** Gracias a la contigüidad, los strings aprovechan la memoria caché de la CPU. Esto hace que, en la práctica, un recorrido O(n) sea mucho más veloz que en estructuras no contiguas como las listas enlazadas.
+- **Data Locality (Localidad de datos):** Gracias a la contigüidad, los strings aprovechan la memoria caché de la CPU. Esto hace que, en la práctica, un recorrido $O(n)$ sea mucho más veloz que en estructuras no contiguas como las listas enlazadas.
 
-- **Inmutabilidad y memoria:** Cualquier modificación implica una copia O(n); concatenar en un bucle acumula ese costo hasta O(n²). Los buffers dinámicos lo evitan, aunque al reasignar pueden duplicar temporalmente el uso de memoria.
+- **Inmutabilidad y memoria:** Cualquier modificación implica una copia $O(n)$; concatenar en un bucle acumula ese costo hasta $O(n^2)$. Los buffers dinámicos lo evitan, aunque al reasignar pueden duplicar temporalmente el uso de memoria.
 
 ---
 
@@ -156,20 +156,20 @@ Un string se implementa típicamente como un **array contiguo de caracteres** ju
 
 Estructura básica:
 
-- char[] (datos)
-- length (tamaño)
-- opcional: capacity o terminador \0
+- `char[]` (datos)
+- `length` (tamaño)
+- opcional: `capacity` o terminador `\0`
 
 **Estrategias:**
 
-- **Inmutable:** cada modificación crea un nuevo array y copia los datos → simple pero costoso (O(n))
-- **Mutable (buffer):** usa capacidad extra y redimensiona cuando es necesario → permite append O(1) amortizado
+- **Inmutable:** cada modificación crea un nuevo array y copia los datos → simple pero costoso, $O(n)$
+- **Mutable (buffer):** usa capacidad extra y redimensiona cuando es necesario → permite append $O(1)$ amortizado
 
 **Algoritmos clave:**
 
-- acceso por índice → O(1)
-- concatenación → copia de arrays → O(n+m)
-- redimensionamiento → O(n) ocasional
+- acceso por índice → $O(1)$
+- concatenación → copia de arrays → $O(n+m)$
+- redimensionamiento → $O(n)$ ocasional
 - búsqueda → recorrido secuencial
 
 ### Invariantes
@@ -178,7 +178,7 @@ Invariantes según el caso:
 
 - En strings inmutables: no modificar el contenido
 - En buffers: tamaño ≤ capacidad
-- En C: debe terminar con \0
+- En C: debe terminar con `\0`
 
 ### Ejemplo de código
 
@@ -208,7 +208,7 @@ for _ in range(5):
 print(buffer.getvalue())
 ```
 
-Se usa un buffer para acumular caracteres sin crear nuevos strings en cada paso, reduciendo el costo a O(n).
+Se usa un buffer para acumular caracteres sin crear nuevos strings en cada paso, reduciendo el costo a $O(n)$.
 
 ---
 
@@ -227,10 +227,10 @@ Casos típicos:
 ### Cuándo NO usarlo
 
 - **Concatenaciones repetidas (ej: en bucles)**
-  Generan múltiples copias → costo O(n²)
+  Generan múltiples copias → costo $O(n^2)$
 
 - **Inserciones o eliminaciones frecuentes**
-  Requieren desplazar caracteres → O(n) por operación
+  Requieren desplazar caracteres → $O(n)$ por operación
 
 - **Texto muy grande con cambios constantes**
   Alto costo en memoria y tiempo por copias
@@ -244,15 +244,15 @@ Alternativas: buffers mutables (StringBuilder), arrays de caracteres o estructur
 
 **Array de caracteres:** estructura de bajo nivel que almacena caracteres de forma contigua. Permite modificación directa y control de memoria, pero requiere manejo manual y es más propensa a errores.
 
-**StringBuilder / buffer mutable:** estructura basada en un array dinámico, diseñada para construir texto de forma eficiente. Permite append O(1) amortizado y evita copias innecesarias, aunque pierde la inmutabilidad del string estándar.
+**StringBuilder / buffer mutable:** estructura basada en un array dinámico, diseñada para construir texto de forma eficiente. Permite append $O(1)$ amortizado y evita copias innecesarias, aunque pierde la inmutabilidad del string estándar.
 
-**Lista enlazada de caracteres:** representa el texto como nodos enlazados. Facilita inserciones y eliminaciones si se tiene la referencia al nodo, pero el acceso es O(n) y tiene peor localidad de memoria.
+**Lista enlazada de caracteres:** representa el texto como nodos enlazados. Facilita inserciones y eliminaciones si se tiene la referencia al nodo, pero el acceso es $O(n)$ y tiene peor localidad de memoria.
 
 **Rope (árbol de strings):** estructura en árbol que almacena fragmentos de texto. Optimiza concatenaciones e inserciones en textos grandes, pero tiene mayor complejidad de implementación y overhead.
 
 ### Ventajas / desventajas
 
-El string estándar es la opción más simple y segura: acceso O(1), thread-safe por inmutabilidad y compatible universalmente. Su principal costo es que cualquier modificación implica una copia O(n), lo que lo hace inferior a StringBuilder para escritura intensiva, a los arrays de caracteres para control de bajo nivel, y a los Ropes para textos muy grandes.
+El string estándar es la opción más simple y segura: acceso $O(1)$, thread-safe por inmutabilidad y compatible universalmente. Su principal costo es que cualquier modificación implica una copia $O(n)$, lo que lo hace inferior a StringBuilder para escritura intensiva, a los arrays de caracteres para control de bajo nivel, y a los Ropes para textos muy grandes.
 
 ### Señales de reconocimiento
 

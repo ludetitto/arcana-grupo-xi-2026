@@ -19,7 +19,7 @@ La aplicación de la técnica se estructura en las siguientes partes:
 2. **Transiciones (Descomposición del problema):** Si `target` no es una de las posiciones representadas por el caso base, entonces estará entre uno contenido entre dos valores: $2^{k-1} - 1 < t < 2^k - 1$. Desde estos puntos, se procede a evaluar todas las decisiones óptimas posibles para reducir la distancia. Para ello, se utilizan dos estrategias:
    - **Pasarse y retroceder:** Aceleramos `k` veces hasta pasarnos del objetivo, ponemos reversa y nos queda una nueva distancia absoluta por recorrer hacia atrás. Se reduce el problema a Costo = `k` + 1 + `resolver`($2^k - 1$ - `target`)
    - **Quedarse corto y tomar envión:** Aceleramos `k-1` veces, frenando antes del objetivo. Esto implica poner reversa, y luego acelerar `i` veces en dirección contraria $(0 ≤ i < {k-1})$ y volvemos a poner reversa para apuntar al objetivo. Esto genera una nueva distancia restante y se reduce el problema a: Costo = (`k` - 1) + 1 + `i` + 1 + `resolver(nuevaDistancia)`
-3. **Memoización y solapamiento de subproblemas:** Dado que las estrategias calculan distancias absolutas restantes, el árbol de recursividad pedirá resolver las mismas distancias múltiples veces por diferentes caminos (por ejemplo, si se tiene `target = 10`, entonces `resolver(3)` puede surgir tanto pasandose y retrocediendo como quedándose corto y tomando envión). Para agilizar estos cálculos, se almacena el costo mínimo calculado para cada distancia en un [[map]]. Antes de evaluar las transiciones para un `target` consultamos si esa distancia ya fue resuelta, retornamos el valor en tiempo `O(1)`, evitando que el árbol de decisiones crezca de forma exponencial.
+3. **Memoización y solapamiento de subproblemas:** Dado que las estrategias calculan distancias absolutas restantes, el árbol de recursividad pedirá resolver las mismas distancias múltiples veces por diferentes caminos (por ejemplo, si se tiene `target = 10`, entonces `resolver(3)` puede surgir tanto pasandose y retrocediendo como quedándose corto y tomando envión). Para agilizar estos cálculos, se almacena el costo mínimo calculado para cada distancia en un [[map]]. Antes de evaluar las transiciones para un `target` consultamos si esa distancia ya fue resuelta, retornamos el valor en tiempo $O(1)$, evitando que el árbol de decisiones crezca de forma exponencial.
 
 
 ### Código
@@ -66,12 +66,12 @@ def _resolver(target: int, map: dict) -> int:
 
 ### Traza de ejemplo
 
-![](arbol-top-down.svg)
+![Árbol de llamadas top-down de resolver(6), pasándose o quedándose corto](0818-arbol-top-down.svg)
 La imagen ilustra el árbol de recursividad generado al ejecutar el algoritmo para `target = 6`.
 
 **Explicación del árbol de recursividad:**
 
-Iniciamos con `_resolver(6, map)` y un Diccionario `map` vacío. Para `target = 6`, el número de aceleraciones que nos pasa del objetivo es `k = 3` (ya que la posición superior es $2^3 - 1 = 7$ y el inferior es $2^{3-1} - 1 = 3$).
+Iniciamos con `_resolver(6, map)` y un [[map]] `map` vacío. Para `target = 6`, el número de aceleraciones que nos pasa del objetivo es `k = 3` (ya que la posición superior es $2^3 - 1 = 7$ y el inferior es $2^{3-1} - 1 = 3$).
 
 1. **Llamada Principal → `resolver(6)`**
    - Estrategia 1: Pasarse → Aceleramos `k = 3` veces hasta llegar a 7. La distancia restante hacia atrás es 7 - 6 = 1. Se realiza la llamada recursiva `_resolver(1)`. Al ser un caso base, retorna el costo de 1 aceleración y lo guarda en el mapa. Costo total de esta rama: 3 + 1 (reversa) + 1 = 5
@@ -82,9 +82,9 @@ Iniciamos con `_resolver(6, map)` y un Diccionario `map` vacío. Para `target = 
    (El algoritmo pausa la resolución de 6 para evaluar el subproblema `_resolver(4)`).
 
 2. **Expansión del subproblema: `_resolver(4)`** Para `target = 6`, calculamos un nuevo `k = 3` (posiciones entre 3 y 7). Se abren nuevas ramas:
-   - Pasarse → Dado que se está en la posición 7, la distancia restante es 7 - 4 = 3. Llamamos a `_resolver(3)`. Como el costo de `_resolver(3)` fue calculado y guardado previamente, se lo busca en el diccionario.
+   - Pasarse → Dado que se está en la posición 7, la distancia restante es 7 - 4 = 3. Llamamos a `_resolver(3)`. Como el costo de `_resolver(3)` fue calculado y guardado previamente, se lo busca en el [[map]].
    - Quedarse corto:
-     - Si `i = 0`: Llegamos a 3 y no retrocedemos. Distancia restante: 4 - 3 + 0 = 1. Llamamos a `_resolver(1)` y se lo encuentra en el diccionario.
+     - Si `i = 0`: Llegamos a 3 y no retrocedemos. Distancia restante: 4 - 3 + 0 = 1. Llamamos a `_resolver(1)` y se lo encuentra en el [[map]].
      - Si `i = 1`: Llegamos a 3 y retrocedemos 1. Distancia restante: 4 - 3 + 1 = 2. Llamamos a `_resolver(2)`, el cual a su vez se expandirá en casos base que volverán a llamar a `_resolver(1)`
 
 3. **Resolución y Retorno** Una vez resuelto `_resolver(4)` (con costo mínimo 5), la llamada principal `_resolver(6)` termina de comparar todos los costos calculados:
@@ -109,7 +109,7 @@ $O(T)$ está dado por la pila de llamadas recursivas y el tamaño del `map` para
 - El valor del `target` es grande. El enfoque top-down sólo calcula las distancias que realmente necesita evaluar (saltando tramos enteros), ahorrando memoria y tiempo.
 
 #### Limitaciones
-- Introduce un poco de overhead por el uso de la pila de recursividad y las búsquedas en el diccionario.
+- Introduce un poco de overhead por el uso de la pila de recursividad y las búsquedas en el [[map]].
 
 ---
 
@@ -119,11 +119,11 @@ En este caso, se procede a rellenar un [[array]] de estados. Las ecuaciones para
 ### Idea de la solución
 La aplicación de la técnica se estructura en las siguientes partes:
 
-- **Definición de la tabla y caso inicial:** Creamos un vector `dp` de tamaño `target + 1`, donde cada casillero `dp[t]` representa el costo mínimo para recorrer la distancia `t`. El caso inicial es `dp[0] = 0` (cero pasos para distancia cero). Además, si al iterar identificamos que la distancia actual `t` es una posición de referencia (`t` = $2^k - 1$), se asigna directamente `dp[t] = k`.
+- **Definición de la tabla y caso inicial:** Creamos un [[array]] `dp` de tamaño `target + 1`, donde cada casillero `dp[t]` representa el costo mínimo para recorrer la distancia `t`. El caso inicial es `dp[0] = 0` (cero pasos para distancia cero). Además, si al iterar identificamos que la distancia actual `t` es una posición de referencia (`t` = $2^k - 1$), se asigna directamente `dp[t] = k`.
 - **Bucle principal:** Mediante un bucle que recorre `t` desde 1 hasta `target`, evaluamos las dos estrategias posibles para cada casillero:
-  - Pasarse y retroceder: Aceleramos `k` veces, ponemos reversa y consultamos el arreglo en la distancia restante: `dp[t] = k + 1 + dp[dist2 - t]`.
-  - Quedarse corto y tomar envión: Aceleramos `k-1` veces, ponemos reversa, retrocedemos acumulando `i` aceleraciones y volvemos a poner reversa. El costo se calcula consultando el arreglo en la distancia restante: `dp[t] = min(dp[t], (k - 1) + 1 + i + 1 + dp[targetMin])`.
-- **Como resuelve bottom-up:** El bucle garantiza el orden óptimo para resolver cualquier distancia `t` ya que las distancias restantes consultadas en las estrategias (tanto pasandote como quedandote corto) siempre serán menores que `t`. Como el bucle avanza de menor a mayor, esas posiciones ya habrán sido resueltas y guardadas en el vector `dp`, permitiendo acceder a los valores en tiempo $O(1)$.
+  - Pasarse y retroceder: Aceleramos `k` veces, ponemos reversa y consultamos el [[array]] en la distancia restante: `dp[t] = k + 1 + dp[dist2 - t]`.
+  - Quedarse corto y tomar envión: Aceleramos `k-1` veces, ponemos reversa, retrocedemos acumulando `i` aceleraciones y volvemos a poner reversa. El costo se calcula consultando el [[array]] en la distancia restante: `dp[t] = min(dp[t], (k - 1) + 1 + i + 1 + dp[targetMin])`.
+- **Como resuelve bottom-up:** El bucle garantiza el orden óptimo para resolver cualquier distancia `t` ya que las distancias restantes consultadas en las estrategias (tanto pasandote como quedandote corto) siempre serán menores que `t`. Como el bucle avanza de menor a mayor, esas posiciones ya habrán sido resueltas y guardadas en el [[array]] `dp`, permitiendo acceder a los valores en tiempo $O(1)$.
 
 ### Código
 
@@ -165,14 +165,14 @@ def resolver(target: int) -> int:
 
 #### Explicación del llenado de la tabla
 
-Comenzamos con un arreglo `dp` de tamaño 7 (del 0 al 6). El estado inicial contiene únicamente el caso base para distancia cero:
+Comenzamos con un [[array]] `dp` de tamaño 7 (del 0 al 6). El estado inicial contiene únicamente el caso base para distancia cero:
 
-Arreglo inicial: `[ 0, ?, ?, ?, ?, ?, ? ]`
+[[array]] inicial: `[ 0, ?, ?, ?, ?, ?, ? ]`
 
 **Paso `t = 1`**
 Posición de referencia cercana: $2^1 - 1 = 1$ → `k = 1`.
 Como `t = 1` es exactamente la posición de referencia, es un caso directo. Nos toma `k = 1` pasos.
-Vector actual: `[ 0, 1, ?, ?, ?, ?, ? ]`
+[[array]] actual: `[ 0, 1, ?, ?, ?, ?, ? ]`
 
 **Paso `t = 2`**
 Posición de referencia cercana: $2^2 - 1 = 3$ → `k = 2`. No es caso directo.
@@ -181,12 +181,12 @@ Estrategias:
 - Me quedo corto (`i = 0`): Avanzamos hasta 1 y retrocedemos 0. Nos falta recorrer una distancia de 1. `Costo = (k - 1) + 1 + 0 + 1 + dp[1] = 1 + 1 + 0 + 1 + 1 = 4`
 
 Se debe elegir el mínimo entre 4 y 4 es 4. Guardamos `dp[2] = 4`.
-Vector actual: `[ 0, 1, 4, ?, ?, ?, ? ]`
+[[array]] actual: `[ 0, 1, 4, ?, ?, ?, ? ]`
 
 **Paso `t = 3`**
 Posición de referencia cercana: $2^2 - 1 = 3$ → `k = 2`.
 Evaluación: Como `t = 3` coincide perfectamente con la posición de referencia, es un caso directo. Nos toma `k = 2` pasos.
-Arreglo actual: `[ 0, 1, 4, 2, ?, ?, ? ]`
+[[array]] actual: `[ 0, 1, 4, 2, ?, ?, ? ]`
 
 **Paso `t = 4`**
 Posición de referencia cercana: $2^3 - 1 = 7$ → `k = 3`. No es caso directo.
@@ -196,7 +196,7 @@ Estrategias:
 - Me quedo corto (`i = 1`): Avanzamos hasta 3 y retrocedemos 1 (llegamos al 2). Falta una distancia de 2. `Costo = 2 + 1 + 1 + 1 + dp[2] = 5 + 4 = 9`
 
 El mínimo de las opciones evaluadas es 5. Guardamos `dp[4] = 5`.
-Vector actual: `[ 0, 1, 4, 2, 5, ?, ? ]`
+[[array]] actual: `[ 0, 1, 4, 2, 5, ?, ? ]`
 
 **Paso `t = 5`**
 Posición de referencia cercana: $2^3 - 1 = 7$ → `k = 3`. No es caso directo.
@@ -206,7 +206,7 @@ Estrategias evaluadas:
 - Me quedo corto (`i = 1`): Avanzamos hasta 3 y retrocedemos 1. Falta una distancia de 3. `Costo = 2 + 1 + 1 + 1 + dp[3] = 5 + 2 = 7`
 
 El mínimo de las opciones evaluadas es 7. Guardamos `dp[5] = 7`.
-Vector actual: `[ 0, 1, 4, 2, 5, 7, ? ]`
+[[array]] actual: `[ 0, 1, 4, 2, 5, 7, ? ]`
 
 **Paso `t = 6` (target original)**
 Posición de referencia cercana: $2^3 - 1 = 7$ → `k = 3`. No es caso directo.
@@ -217,7 +217,7 @@ Estrategias:
 
 El mínimo de las opciones evaluadas es 5. Guardamos `dp[6] = 5`.
 
-Al finalizar todo el bucle, la respuesta para `target = 6` se lee directamente en la última posición del vector que se fue creando:
+Al finalizar todo el bucle, la respuesta para `target = 6` se lee directamente en la última posición del [[array]] que se fue creando:
 
 `dp = [ 0, 1, 4, 2, 5, 7, 5 ]`
 
@@ -229,14 +229,14 @@ Esto quiere decir que se requieren 5 pasos para llegar a `target = 6`
 $O(T\log{T})$, donde `T` es el valor de `target`. El algoritmo recorre de forma iterativa todos los valores desde 1 hasta `T` para completar el vector. Para cada estado `T`, ejecuta un bucle de hasta $\log{T}$ iteraciones, correspondiente a los distintos casos en los que el auto se queda corto y toma envión. Cómo se procesan `T` estados y cada uno requiere $\log{T}$ operaciones en el peor caso, la complejidad temporal total es $O(T\log{T})$.
 
 #### Espacial
-$O(T)$. El algoritmo utiliza un vector `dp` de tamaño `t + 1`, donde almacena la cantidad mínima de instrucciones para llegar a cada posición desde 0 hasta `T`. No utiliza recursividad, por lo que no existe consumo adicional por pila de llamadas. La complejidad espacial está dominada por el tamaño del vector, resultando en $O(T)$.
+$O(T)$. El algoritmo utiliza un [[array]] `dp` de tamaño `t + 1`, donde almacena la cantidad mínima de instrucciones para llegar a cada posición desde 0 hasta `T`. No utiliza recursividad, por lo que no existe consumo adicional por pila de llamadas. La complejidad espacial está dominada por el tamaño del [[array]], resultando en $O(T)$.
 
 ### Cuando usar esta técnica
 
 #### Favorable cuando
 - Se desea evitar la recursividad y el riesgo de desbordamiento de la pila de llamadas.
 - Es necesario obtener la solución para todos los estados desde 1 hasta `target`, ya que el vector se completa de manera iterativa.
-- Se busca una implementación con menor sobrecarga, al utilizar accesos directos a un arreglo en lugar de llamadas recursivas y un diccionario.
+- Se busca una implementación con menor sobrecarga, al utilizar accesos directos a un [[array]] en lugar de llamadas recursivas y un [[map]].
 
 #### Limitaciones
 - Calcula todos los estados hasta `target`, incluso aquellos que nunca serían necesarios para obtener la respuesta final, lo que puede realizar trabajo adicional cuando existen muchos estados que podrían evitarse con un enfoque top-down.
@@ -244,7 +244,7 @@ $O(T)$. El algoritmo utiliza un vector `dp` de tamaño `t + 1`, donde almacena l
 ---
 
 ## Diferencia entre los enfoques de programación dinámica
-Aunque ambos enfoques de DP son superiores a BFS en promedio, en el peor caso todos son $O(T log T)$.
+Aunque ambos enfoques de DP son superiores a BFS en promedio, en el peor caso todos son $O(T \log T)$.
 
 ## Comparación con Búsqueda en Anchura (BFS)
 A diferencia de [[0818_race_car-bfs-fuerza-bruta]] que explora paso a paso el árbol de posibilidades teniendo en cuenta posición y velocidad, la programación dinámica reduce el problema a solo la distancia absoluta. Esto permite que se reemplace la "simulación" con saltos matemáticos directos entre posiciones de referencia. Como resultado, la técnica de programación dinámica es superior en espacio ($O(T)$ frente a $O(T\log{T})$ de BFS) y en promedio mejor en velocidad. Como dificultad, la lógica matemática que plantea el problema es más difícil de deducir que en BFS.

@@ -1,0 +1,71 @@
+<svg width="620" height="370" viewBox="0 0 620 370" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    text { font-family: 'Courier New', Courier, monospace; }
+    .frame       { fill: #f5f7fa; stroke: #9baec8; stroke-width: 1.8; }
+    .divider     { stroke: #9baec8; stroke-width: 1; }
+    .val         { font-size: 18px; font-weight: 700; fill: #1a1a2e; text-anchor: middle; }
+    .idx         { font-size: 12px; fill: #777777; text-anchor: middle; }
+    .op          { font-size: 13px; font-weight: 700; fill: #777777; text-anchor: middle; }
+    .op-arrow    { stroke: #777777; stroke-width: 1.5; fill: none; }
+    .op-arrow-fill { fill: #777777; }
+    .top-arrow   { stroke: #c0742a; stroke-width: 1.8; fill: none; }
+    @media (prefers-color-scheme: dark) {
+      .frame       { fill: #1e2330; stroke: #4a6fa5; }
+      .divider     { stroke: #4a6fa5; }
+      .val         { fill: #e2e8f0; }
+      .idx         { fill: #8899aa; }
+      .op            { fill: #8899aa; }
+      .op-arrow      { stroke: #8899aa; }
+      .op-arrow-fill { fill: #8899aa; }
+      .top-arrow   { stroke: #d4884a; }
+    }
+  </style>
+
+  <!-- antes: array lleno -->
+  <text x="30" y="30" class="op" style="text-anchor:start">antes — capacidad: 4 | size: 4 (lleno)</text>
+  <rect x="30" y="50" width="280" height="60" rx="8" class="frame"/>
+  <line x1="100" y1="50" x2="100" y2="110" class="divider"/>
+  <line x1="170" y1="50" x2="170" y2="110" class="divider"/>
+  <line x1="240" y1="50" x2="240" y2="110" class="divider"/>
+  <text x="65"  y="87" class="val">12</text>
+  <text x="135" y="87" class="val">34</text>
+  <text x="205" y="87" class="val">7</text>
+  <text x="275" y="87" class="val">91</text>
+  <text x="65"  y="128" class="idx">0</text>
+  <text x="135" y="128" class="idx">1</text>
+  <text x="205" y="128" class="idx">2</text>
+  <text x="275" y="128" class="idx">3</text>
+
+  <!-- transicion: append(50) no entra, se redimensiona -->
+  <path d="M170,145 L170,203" class="op-arrow"/>
+  <path d="M164,203 L170,213 L176,203 Z" class="op-arrow-fill"/>
+  <text x="185" y="172" class="op" style="text-anchor:start">append(50): size == capacidad</text>
+  <text x="185" y="190" class="op" style="text-anchor:start">redimensiona x2 · O(n) copias</text>
+
+  <!-- despues: capacidad duplicada -->
+  <text x="30" y="235" class="op" style="text-anchor:start">después — capacidad: 8 | size: 5</text>
+  <rect x="30" y="255" width="520" height="60" rx="8" class="frame"/>
+  <line x1="95"  y1="255" x2="95"  y2="315" class="divider"/>
+  <line x1="160" y1="255" x2="160" y2="315" class="divider"/>
+  <line x1="225" y1="255" x2="225" y2="315" class="divider"/>
+  <line x1="290" y1="255" x2="290" y2="315" class="divider"/>
+  <line x1="355" y1="255" x2="355" y2="315" class="divider"/>
+  <line x1="420" y1="255" x2="420" y2="315" class="divider"/>
+  <line x1="485" y1="255" x2="485" y2="315" class="divider"/>
+
+  <text x="62"  y="292" class="val">12</text>
+  <text x="127" y="292" class="val">34</text>
+  <text x="192" y="292" class="val">7</text>
+  <text x="257" y="292" class="val">91</text>
+  <rect x="292" y="257" width="61" height="56" rx="4" class="top-arrow"/>
+  <text x="322" y="292" class="val">50</text>
+
+  <text x="62"  y="333" class="idx">0</text>
+  <text x="127" y="333" class="idx">1</text>
+  <text x="192" y="333" class="idx">2</text>
+  <text x="257" y="333" class="idx">3</text>
+  <text x="322" y="333" class="idx">4</text>
+  <text x="387" y="333" class="idx">5</text>
+  <text x="452" y="333" class="idx">6</text>
+  <text x="517" y="333" class="idx">7</text>
+</svg>

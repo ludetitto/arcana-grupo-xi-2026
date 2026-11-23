@@ -15,7 +15,7 @@ Un **array** es una **colección de elementos contiguos de datos del mismo tipo*
 
 Resuelve el problema de tener que crear muchas variables individuales. Por ejemplo, en lugar de tener `amigo1`, `amigo2`, `amigo3`, podemos tener una sola lista de `amigos` que almacene todos los valores.
 
-### Definición y propiedades
+### Definición / propiedades
 
 - **Estructura de datos lineal**: Los elementos están organizados en una secuencia.
 - **Tamaño Fijo**: Una vez que un array es creado, su tamaño no puede ser cambiado. Esto significa que debemos saber el número máximo de elementos que necesitaremos almacenar en el momento de la creación del array.  
@@ -35,9 +35,9 @@ Un **array** se representa internamente como un **bloque contiguo de memoria**, 
 
 El acceso a un elemento se realiza calculando su dirección de memoria a partir de una dirección base  y un desplazamiento fijo (stride) multiplicado por el índice. Esta organización es la que permite que el acceso por índice tenga complejidad $O(1)$.
 
-![](/attachments/grimorio/data-structures/array.svg)
+![Array de 8 enteros con índices y el cálculo de la dirección de A[3] como base + 3 x tamaño](array.svg)
 
-Se observa una estructura lineal donde cada elemento es accesible directamente mediante su índice. El cálculo de indexación es $Dirección(A[i]) = base + i × tamaño$.
+Se observa una estructura lineal donde cada elemento es accesible directamente mediante su índice. El cálculo de indexación es $\text{Dirección}(A[i]) = \text{base} + i \times \text{tamaño}$.
 
 ## 2. Operaciones y complejidad
 
@@ -48,7 +48,7 @@ Se observa una estructura lineal donde cada elemento es accesible directamente m
 ### Complejidad
 - Acceso y actualización por índice: $O(1)$ (tiempo constante)
 - Búsqueda por valor: $O(n)$ en el peor caso (debe recorrer el array).
-- Búsqueda en arrays ordenados: la búsqueda desciende a $O(log\,n)$ si se utilizan algoritmos como **búsqueda binaria**.
+- Búsqueda en arrays ordenados: la búsqueda desciende a $O(\log n)$ si se utilizan algoritmos como **búsqueda binaria**.
 
 Es requerido que el array respete estas complejidades debido a su representación contigua en memoria.
 
@@ -157,8 +157,8 @@ Además, las listas enlazadas utilizan memoria dinámica, lo que les permite aju
 
 | Ventajas | Desventajas |
 | ----- | ----- |
-| **Acceso rápido:** Podes acceder a cualquier elemento instantáneamente si conoces su índice (Complejidad O(1)). | **Tamaño fijo:** Una vez definido el tamaño, no se puede cambiar. Tienes que crear uno nuevo y copiar los datos. |
-| **Eficiencia de memoria:** No desperdician espacio en punteros o metadatos adicionales (como las listas enlazadas). | **Costo de inserción/borrado:** Para insertar un elemento al inicio, es inevitable "empujar" todos los demás hacia adelante (Complejidad O(n)). |
+| **Acceso rápido:** Podes acceder a cualquier elemento instantáneamente si conoces su índice (Complejidad $O(1)$). | **Tamaño fijo:** Una vez definido el tamaño, no se puede cambiar. Tienes que crear uno nuevo y copiar los datos. |
+| **Eficiencia de memoria:** No desperdician espacio en punteros o metadatos adicionales (como las listas enlazadas). | **Costo de inserción/borrado:** Para insertar un elemento al inicio, es inevitable "empujar" todos los demás hacia adelante (Complejidad $O(n)$). |
 | **Simplicidad:** Son fáciles de entender y están disponibles en prácticamente todos los lenguajes de programación. | **Memoria contigua:** Requieren un bloque de memoria ininterrumpido; si la memoria está muy fragmentada, es posible que la creación del array falle. |
 
 ### Señales de reconocimiento
@@ -190,6 +190,6 @@ En arquitecturas modernas, el array se beneficia enormemente del caché de la CP
 
 ## 6. Referencias y recursos
 
-- [[COR2011]] - Chapter 10: Elementary Data Structures.
-- [[LAF2002]] - Chapter 2: Arrays.
+- [[COR2011]] - Chapter 10.
+- [[LAF2002]] - Chapter 2.
 

@@ -12,11 +12,11 @@ alias:
 
 **Idea central:** Un `Set` es una colección de elementos únicos y no ordenados, copia directa de la noción matemática de conjunto: cada elemento o pertenece o no pertenece, sin multiplicidad ni posición.
 
-**Problema que resuelve:** Hace eficientes operaciones que en una lista serían O(n): pruebas de membresía (`x in S`), deduplicación de colecciones y operaciones algebraicas (unión, intersección, diferencia, subconjunto). Donde una lista pregunta _"¿qué hay en la posición i?"_, el `Set` responde _"¿está x?"_.
+**Problema que resuelve:** Hace eficientes operaciones que en una lista serían $O(n)$: pruebas de membresía (`x in S`), deduplicación de colecciones y operaciones algebraicas (unión, intersección, diferencia, subconjunto). Donde una lista pregunta _"¿qué hay en la posición i?"_, el `Set` responde _"¿está x?"_.
 
 ---
 
-### Definición y propiedades
+### Definición / propiedades
 
 **Definición formal:** Por el axioma de extensionalidad de Zermelo-Fraenkel, un conjunto está totalmente determinado por su pertenencia:
 
@@ -30,7 +30,7 @@ De esta definición se sacan las siguientes propiedades:
 
 ---
 
-### Representación interna
+### Representación
 
 #### HashSet (tabla hash)
 
@@ -38,17 +38,17 @@ Python implementa su `set` sobre una [[hash table]] de direccionamiento abierto.
 
 **Diagrama de una tabla hash con 8 slots:**
 
-![](hashset.svg)
+![Hash set de 8 slots donde cada string cae en la posición de su hash](hashset.svg)
 
 `hash("ab") % 8 = 1` | `hash("xy") % 8 = 3` | `hash("cd") % 8 = 5` | `hash("hi") % 8 = 7`
 
 #### TreeSet (árbol)
 
-Python no incluye un `TreeSet` en su librería estándar; `sortedcontainers.SortedSet` es la alternativa idiomática. Internamente, la garantía de unicidad y orden se logra con un **árbol binario de búsqueda balanceado** con operaciones O(log n) en el peor caso.
+Python no incluye un `TreeSet` en su librería estándar; `sortedcontainers.SortedSet` es la alternativa idiomática. Internamente, la garantía de unicidad y orden se logra con un **árbol binario de búsqueda balanceado** con operaciones $O(\log n)$ en el peor caso.
 
 **Diagrama de un árbol binario de búsqueda balanceado:**
 
-![](/attachments/grimorio/data-structures/treeSet.svg)
+![Tree set como árbol binario de búsqueda balanceado con la búsqueda de 40](tree-set.svg)
 
 
 ---
@@ -73,31 +73,31 @@ Python no incluye un `TreeSet` en su librería estándar; `sortedcontainers.Sort
 
 ---
 
-### Tabla de complejidad
+### Complejidad
 
 | Operación | `set` (promedio) | `set` (peor caso) | `SortedSet` |
 |---|:---:|:---:|:---:|
-| `add`, `remove`, `discard`, `in` | O(1) | O(n)* | O(log n) |
-| `len`, `clear` | O(1) | O(1) | O(1) |
-| `for x in s` | O(n) | O(n) | O(n) |
-| `union` | O(\|s\|+\|t\|) | O(\|s\|·\|t\|) | O(\|s\|+\|t\|)* |
-| `intersection`, `difference` | O(\|s\|+\|t\|) | O(\|s\|·\|t\|) | O(\|s\| log \|t\|) |
-| `issubset` | O(\|s\|) | O(\|s\|·\|t\|) | O(\|s\| log \|t\|) |
-| `min()`, `max()`, rangos | O(n) | O(n) | O(log n) |
+| `add`, `remove`, `discard`, `in` | $O(1)$ | $O(n)$* | $O(\log n)$ |
+| `len`, `clear` | $O(1)$ | $O(1)$ | $O(1)$ |
+| `for x in s` | $O(n)$ | $O(n)$ | $O(n)$ |
+| `union` | $O(\|s\|+\|t\|)$ | $O(\|s\| \cdot \|t\|)$ | $O(\|s\|+\|t\|)$* |
+| `intersection`, `difference` | $O(\|s\|+\|t\|)$ | $O(\|s\| \cdot \|t\|)$ | $O(\|s\| \log \|t\|)$ |
+| `issubset` | $O(\|s\|)$ | $O(\|s\| \cdot \|t\|)$ | $O(\|s\| \log \|t\|)$ |
+| `min()`, `max()`, rangos | $O(n)$ | $O(n)$ | $O(\log n)$ |
 
-> **\*Peor caso O(n):** ocurre con colisiones masivas forzadas artificialmente. Es extremadamente improbable.
+> **\*Peor caso $O(n)$:** ocurre con colisiones masivas forzadas artificialmente. Es extremadamente improbable.
 >
-> **\*Unión O(\|s\|+\|t\|) en SortedSet:** se logra aprovechando que ambos conjuntos están ordenados. La intersección y diferencia, en cambio, buscan cada elemento de `s` en `t`, dando O(\|s\| log \|t\|).
+> **\*Unión $O(\|s\|+\|t\|)$ en SortedSet:** se logra aprovechando que ambos conjuntos están ordenados. La intersección y diferencia, en cambio, buscan cada elemento de `s` en `t`, dando $O(\|s\| \log \|t\|)$.
 
-**Complejidad espacial:** Ambas implementaciones requieren **O(n)**. El `set` paga por los slots vacíos de la tabla (capacidad ≈ n / 0.6); el `SortedSet` paga punteros de árbol por nodo.
+**Complejidad espacial:** Ambas implementaciones requieren $O(n)$. El `set` paga por los slots vacíos de la tabla (capacidad ≈ n / 0.6); el `SortedSet` paga punteros de árbol por nodo.
 
 ---
 
 ### Detalles operativos
 
-**Costos ocultos del rehashing:** Al superar el factor de carga, Python redimensiona la tabla y reinserta todos los elementos: O(n) en esa operación puntual, pero **O(1) amortizado** gracias al redimensionado geométrico.
+**Costos ocultos del rehashing:** Al superar el factor de carga, Python redimensiona la tabla y reinserta todos los elementos: $O(n)$ en esa operación puntual, pero **$O(1)$ amortizado** gracias al redimensionado geométrico.
 
-**Costos de las operaciones algebraicas:** `s | t`, `s & t`, `s - t` crean un set nuevo, consumiendo O(|s|+|t|) espacio adicional. Las variantes in-place (`|=`, `&=`, `-=`, equivalentes a `update`, `intersection_update`, `difference_update`) mutan `s` y evitan esa copia.
+**Costos de las operaciones algebraicas:** `s | t`, `s & t`, `s - t` crean un set nuevo, consumiendo $O(|s|+|t|)$ espacio adicional. Las variantes in-place (`|=`, `&=`, `-=`, equivalentes a `update`, `intersection_update`, `difference_update`) mutan `s` y evitan esa copia.
 
 **Duplicados:** Insertar un elemento que ya existe es un no-op silencioso: `s.add(x)` no lanza error ni señal.
 
@@ -110,7 +110,7 @@ Python no incluye un `TreeSet` en su librería estándar; `sortedcontainers.Sort
 
 ## 3. Implementación
 
-### Idea central
+### Idea de implementación
 
 Mantener una colección que impida ingresar repetidos. Implementado con un `HashMap` o `LinkedHashMap`, debe asegurarse que los datos no se modifican; en un `TreeMap`, debe haber un criterio definido para ordenar los datos.
 
@@ -124,7 +124,7 @@ Mantener una colección que impida ingresar repetidos. Implementado con un `Hash
 
 ---
 
-### Implementación manual en Python
+### Ejemplo de código
 
 ```python
 class MiSet:
@@ -181,14 +181,14 @@ print("Intersección:", a.interseccion(b))  # ['mundo']
 
 ## 4. Uso y criterio
 
-### Cuándo usarlo ✅
+### Casos de uso
 
 - Colección sin elementos duplicados.
 - Operaciones matemáticas de conjuntos.
 - *Membership testing* (verificar si ya existe un elemento en la colección).
 - Seguimiento de elementos visitados.
 
-### Cuándo **no** usarlo ❌
+### Cuándo NO usarlo
 
 - Cuando el **orden** de los elementos importa (el `HashSet` estándar no lo garantiza; si se necesita orden, usar `LinkedHashSet` o `SortedSet`).
 - Cuando se necesita trabajar con duplicados.
@@ -196,19 +196,19 @@ print("Intersección:", a.interseccion(b))  # ['mundo']
 
 ---
 
-### Comparación con otras estructuras
+### Comparaciones
 
 | Estructura | Duplicados | Orden | Búsqueda | Cuándo elegirla |
 |---|:---:|:---:|:---:|---|
-| **Set** | ✗ | ✗ | O(1) | Unicidad y velocidad de búsqueda |
-| **Lista** | ✓ | ✓ | O(n) | Orden y acceso por índice importan |
-| **Diccionario ([[map]])** | ✗ (claves) | ✗ | O(1) | Necesitás asociar datos a cada clave |
+| **Set** | ✗ | ✗ | $O(1)$ | Unicidad y velocidad de búsqueda |
+| **Lista** | ✓ | ✓ | $O(n)$ | Orden y acceso por índice importan |
+| **Diccionario ([[map]])** | ✗ (claves) | ✗ | $O(1)$ | Necesitás asociar datos a cada clave |
 
 > Un `set` es técnicamente un diccionario donde solo importan las claves y no los valores.
 
 ---
 
-### Ventajas y desventajas
+### Ventajas / desventajas
 
 **Ventajas:**
 - Operaciones en tiempo constante (HashSet) o logarítmico (TreeSet).
@@ -235,7 +235,7 @@ Considerá usar un `Set` cuando el problema presente alguna de estas caracterís
 
 ## 5. Relaciones y extensiones
 
-### Variantes del Set
+### Variantes
 
 | Variante | Descripción |
 |---|---|
@@ -252,7 +252,7 @@ Considerá usar un `Set` cuando el problema presente alguna de estas caracterís
 
 ### Relación con otras estructuras
 
-- **[[hash table]]:** la implementación estándar de `Set` (`HashSet`) reutiliza directamente el mecanismo de hashing para lograr membership testing en O(1).
+- **[[hash table]]:** la implementación estándar de `Set` (`HashSet`) reutiliza directamente el mecanismo de hashing para lograr membership testing en $O(1)$.
 - **[[map]]:** un `Set` es conceptualmente un `Map` donde solo importan las claves, no los valores asociados.
 - **Autómatas:** base para definir alfabetos, estados y transiciones.
 - **[[linked list]] / [[dynamic array]]:** un `Set` puede implementarse sobre ellos, aunque con menor eficiencia.
@@ -270,7 +270,7 @@ En sistemas operativos o aplicaciones, los permisos de un usuario suelen represe
 permisos_usuario = {"leer", "escribir", "ejecutar"}
 ```
 
-Verificar un permiso es O(1): `"escribir" in permisos_usuario`.
+Verificar un permiso es $O(1)$: `"escribir" in permisos_usuario`.
 
 #### Caché y deduplicación
 

@@ -24,13 +24,13 @@ Un B-Tree de grado M $\ge$ 3 cumple:
 ### Representación
 Cada nodo guarda un arreglo de claves ordenadas, un arreglo de punteros a hijos y un flag de si es hoja.
 
-![Diagrama de un B-Tree de grado 4, con raíz de dos claves y tres hojas|254](/attachments/grimorio/data-structures/b-tree.svg)
+![Búsqueda de la clave 75 en un B-Tree de tres niveles](b-tree.svg)
 ## 2. Operaciones y complejidad
 
 ### Operaciones principales
 - `find`: Compara la clave buscada con las claves del nodo actual. Si hay coincidencia, retorna el valor. Si no, desciende al hijo cuyo rango contenga la clave buscada.
 - `insert`: Añade una nueva clave en el nivel de las hojas. A medida que desciende por el árbol, divide cualquier nodo que esté lleno.
-- `delete`: Remueve una clave. Si la clave está en un nodo interno, se reemplaza por la clave inmediatamente anterior o posterior en el orden del árbol. Si la eliminación deja a un nodo con menos claves del mínimo permitido, se rebalancea pidiendo una clave prestada a un hermano adyacente o se fusionan. 
+- `delete`: Remueve una clave. Si la clave está en un nodo interno, se reemplaza por la clave inmediatamente anterior o posterior en el orden del árbol. Si la eliminación deja a un nodo con menos claves del mínimo permitido, se rebalancea pidiendo una clave prestada a un hermano adyacente o se fusionan.
 - `traverse`: Recorre el árbol in-order.
 
 ### Complejidad
@@ -42,19 +42,19 @@ Cada nodo guarda un arreglo de claves ordenadas, un arreglo de punteros a hijos 
 | `traverse` | $O(n)$ | $O(n)$ | $O(\log n)$ (por la pila de llamadas) |
 
 ### Costos ocultos
-*   **Operaciones de E/S:** El rendimiento de un árbol B no se basa solo en el uso de CPU, sino cuántos bloques de disco debe leer. Si los nodos no coinciden con el tamaño de una página de disco, se aumentan los accesos físicos.
-*   **Gestión de memoria:** Insertar o eliminar elementos puede desencadenar una cascada de divisiones o fusiones de nodos que sube hasta la raíz. Esto implica reasignación de memoria (`reallocs`).
-*   **Búsqueda intra-nodo:** Una vez que se carga un nodo en memoria, el algoritmo debe encontrar la clave correcta dentro de ese nodo. Esto agrega un costo de $O(\log m)$ por nivel si se usa búsqueda binaria.
+-   **Operaciones de E/S:** El rendimiento de un árbol B no se basa solo en el uso de CPU, sino cuántos bloques de disco debe leer. Si los nodos no coinciden con el tamaño de una página de disco, se aumentan los accesos físicos.
+-   **Gestión de memoria:** Insertar o eliminar elementos puede desencadenar una cascada de divisiones o fusiones de nodos que sube hasta la raíz. Esto implica reasignación de memoria (`reallocs`).
+-   **Búsqueda intra-nodo:** Una vez que se carga un nodo en memoria, el algoritmo debe encontrar la clave correcta dentro de ese nodo. Esto agrega un costo de $O(\log m)$ por nivel si se usa búsqueda binaria.
 
 ### Casos especiales
-*   **Estructura vacía:** Un `find` retorna un fallo. Un `insert` crea el nodo raíz y coloca la clave.
-*   **Estructura llena:** Un nodo está "lleno" cuando alcanza (m-1) claves, siendo m el orden del árbol. Si el nodo raíz se llena y se necesita hacer un `split`, la raíz se divide en dos y se crea una nueva raíz por encima de ellas.
-*   **Duplicados:** El árbol B clásico requiere claves únicas. Si se necesitan almacenar duplicados, el algoritmo se modifica para que cada clave apunte a una array de valores.
-*   **Orden:** A diferencia de una [[hash table]], el árbol B mantiene las claves estrictamente ordenadas. Esto lo hace ideal para consultas de rangos (ej. `SELECT * FROM tabla WHERE edad BETWEEN 20 AND 30`).
+-   **Estructura vacía:** Un `find` retorna un fallo. Un `insert` crea el nodo raíz y coloca la clave.
+-   **Estructura llena:** Un nodo está "lleno" cuando alcanza (m-1) claves, siendo m el orden del árbol. Si el nodo raíz se llena y se necesita hacer un `split`, la raíz se divide en dos y se crea una nueva raíz por encima de ellas.
+-   **Duplicados:** El árbol B clásico requiere claves únicas. Si se necesitan almacenar duplicados, el algoritmo se modifica para que cada clave apunte a una array de valores.
+-   **Orden:** A diferencia de una [[hash table]], el árbol B mantiene las claves estrictamente ordenadas. Esto lo hace ideal para consultas de rangos (ej. `SELECT * FROM tabla WHERE edad BETWEEN 20 AND 30`).
 
 ### Comportamiento en concurrencia y fallos
-*   **Concurrencia:** Permitir que múltiples hilos lean y escriban simultáneamente en un árbol B es muy complejo, ya que un `split` o `merge` altera la estructura de los punteros, invalidando los caminos de lectura de otros hilos. Se utilizan protocolos estrictos de *latching* (bloqueos temporales) conocidos como "hand-over-hand locking" o variantes estructurales como el **B-link tree** (que añade punteros laterales entre nodos hermanos para mitigar cuellos de botella en la raíz).
-*   **Tolerancia a fallos:** Si un sistema colapsa en medio de un `split` de un nodo, el árbol quedará corrupto y los datos inaccesibles. Por esto, en los motores de bases de datos, cualquier modificación al árbol B se escribe primero de forma secuencial en un registro de transacciones (Write-Ahead Log) antes de tocar el árbol físico.
+-   **Concurrencia:** Permitir que múltiples hilos lean y escriban simultáneamente en un árbol B es muy complejo, ya que un `split` o `merge` altera la estructura de los punteros, invalidando los caminos de lectura de otros hilos. Se utilizan protocolos estrictos de *latching* (bloqueos temporales) conocidos como "hand-over-hand locking" o variantes estructurales como el **B-link tree** (que añade punteros laterales entre nodos hermanos para mitigar cuellos de botella en la raíz).
+-   **Tolerancia a fallos:** Si un sistema colapsa en medio de un `split` de un nodo, el árbol quedará corrupto y los datos inaccesibles. Por esto, en los motores de bases de datos, cualquier modificación al árbol B se escribe primero de forma secuencial en un registro de transacciones (Write-Ahead Log) antes de tocar el árbol físico.
 
 ## 3. Implementación
 

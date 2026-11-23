@@ -1,0 +1,47 @@
+<svg width="600" height="260" viewBox="0 0 600 260" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    text { font-family: 'Courier New', Courier, monospace; }
+    .frame       { fill: #f5f7fa; stroke: #9baec8; stroke-width: 1.8; }
+    .val-sm      { font-size: 15px; font-weight: 700; fill: #1a1a2e; text-anchor: middle; }
+    .op          { font-size: 13px; font-weight: 700; fill: #777777; text-anchor: middle; }
+    .link        { stroke: #9baec8; stroke-width: 1.8; fill: none; }
+    .link-fill   { fill: #9baec8; }
+    @media (prefers-color-scheme: dark) {
+      .frame       { fill: #1e2330; stroke: #4a6fa5; }
+      .val-sm      { fill: #e2e8f0; }
+      .op            { fill: #8899aa; }
+      .link        { stroke: #4a6fa5; }
+      .link-fill   { fill: #4a6fa5; }
+    }
+  </style>
+
+  <!-- con __slots__: la instancia es un array fijo de referencias, sin diccionario interno -->
+  <rect x="20" y="110" width="140" height="40" rx="6" class="frame"/>
+  <text x="90" y="134" class="val-sm">Punto3D</text>
+  <text x="90" y="98" class="op">instancia</text>
+
+  <path d="M160,130 L210,130" class="link"/>
+  <path d="M212,137 L225,130 L212,123 Z" class="link-fill"/>
+
+  <rect x="220" y="110" width="140" height="40" rx="6" class="frame"/>
+  <text x="290" y="134" class="val-sm">header</text>
+  <text x="290" y="98" class="op">__slots__</text>
+
+  <!-- x: float -->
+  <path d="M360,130 L412,83" class="link"/>
+  <path d="M419,89 L424,75 L410,78 Z" class="link-fill"/>
+  <rect x="420" y="60" width="140" height="36" rx="6" class="frame"/>
+  <text x="490" y="83" class="val-sm">x: float</text>
+
+  <!-- y: float -->
+  <path d="M360,130 L410,130" class="link"/>
+  <path d="M412,137 L425,130 L412,123 Z" class="link-fill"/>
+  <rect x="420" y="112" width="140" height="36" rx="6" class="frame"/>
+  <text x="490" y="135" class="val-sm">y: float</text>
+
+  <!-- z: float -->
+  <path d="M360,130 L412,177" class="link"/>
+  <path d="M410,182 L424,185 L419,171 Z" class="link-fill"/>
+  <rect x="420" y="164" width="140" height="36" rx="6" class="frame"/>
+  <text x="490" y="187" class="val-sm">z: float</text>
+</svg>

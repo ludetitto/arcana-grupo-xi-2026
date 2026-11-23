@@ -1,0 +1,59 @@
+<svg width="480" height="250" viewBox="0 0 480 250" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    text { font-family: 'Courier New', Courier, monospace; }
+    .frame       { fill: #f5f7fa; stroke: #9baec8; stroke-width: 1.8; }
+    .val-sm      { font-size: 15px; font-weight: 700; fill: #1a1a2e; text-anchor: middle; }
+    .link        { stroke: #9baec8; stroke-width: 1.8; fill: none; }
+    .top-label   { font-size: 13px; font-weight: 700; fill: #c0742a; text-anchor: middle; }
+    .top-arrow   { stroke: #c0742a; stroke-width: 2.2; fill: none; }
+    .top-arrow-fill { fill: #c0742a; }
+    @media (prefers-color-scheme: dark) {
+      .frame       { fill: #1e2330; stroke: #4a6fa5; }
+      .val-sm      { fill: #e2e8f0; }
+      .link        { stroke: #4a6fa5; }
+      .top-label   { fill: #d4884a; }
+      .top-arrow   { stroke: #d4884a; }
+      .top-arrow-fill { fill: #d4884a; }
+    }
+  </style>
+
+  <!-- buscar(40): resalta el camino recorrido en el arbol -->
+  <text x="240" y="26" class="top-label">buscar(40)</text>
+  <path d="M240,32 L240,40" class="top-arrow"/>
+  <path d="M234,40 L240,48 L246,40 Z" class="top-arrow-fill"/>
+
+  <!-- aristas -->
+  <line x1="240" y1="70" x2="140" y2="130" class="link"/>
+  <line x1="140" y1="130" x2="80"  y2="200" class="link"/>
+  <line x1="140" y1="130" x2="200" y2="200" class="link"/>
+  <line x1="340" y1="130" x2="400" y2="200" class="link"/>
+
+  <!-- camino de busqueda: 30 -> 50 -> 40 -->
+  <line x1="240" y1="70"  x2="340" y2="130" class="top-arrow"/>
+  <line x1="340" y1="130" x2="280" y2="200" class="top-arrow"/>
+
+  <!-- nodos -->
+  <circle cx="240" cy="70"  r="26" class="frame"/>
+  <circle cx="240" cy="70"  r="26" class="top-arrow"/>
+  <text x="240" y="70" dominant-baseline="central" class="val-sm">30</text>
+
+  <circle cx="140" cy="130" r="26" class="frame"/>
+  <text x="140" y="130" dominant-baseline="central" class="val-sm">15</text>
+
+  <circle cx="340" cy="130" r="26" class="frame"/>
+  <circle cx="340" cy="130" r="26" class="top-arrow"/>
+  <text x="340" y="130" dominant-baseline="central" class="val-sm">50</text>
+
+  <circle cx="80" cy="200" r="26" class="frame"/>
+  <text x="80" y="200" dominant-baseline="central" class="val-sm">10</text>
+
+  <circle cx="200" cy="200" r="26" class="frame"/>
+  <text x="200" y="200" dominant-baseline="central" class="val-sm">20</text>
+
+  <circle cx="280" cy="200" r="26" class="frame"/>
+  <circle cx="280" cy="200" r="26" class="top-arrow"/>
+  <text x="280" y="200" dominant-baseline="central" class="val-sm">40</text>
+
+  <circle cx="400" cy="200" r="26" class="frame"/>
+  <text x="400" y="200" dominant-baseline="central" class="val-sm">60</text>
+</svg>

@@ -1,0 +1,74 @@
+<svg width="620" height="270" viewBox="0 0 620 270" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    text { font-family: 'Courier New', Courier, monospace; }
+    .frame       { fill: #f5f7fa; stroke: #9baec8; stroke-width: 1.8; }
+    .divider     { stroke: #9baec8; stroke-width: 1; }
+    .val         { font-size: 18px; font-weight: 700; fill: #1a1a2e; text-anchor: middle; }
+    .idx         { font-size: 12px; fill: #777777; text-anchor: middle; }
+    .op          { font-size: 13px; font-weight: 700; fill: #777777; text-anchor: middle; }
+    .ghost       { fill: #f5f7fa; fill-opacity: 0.5; stroke: #777777; stroke-width: 1.5; stroke-dasharray: 4,3; }
+    .ghost-val   { font-size: 16px; font-weight: 700; fill: #555555; text-anchor: middle; }
+    .top-label   { font-size: 13px; font-weight: 700; fill: #c0742a; text-anchor: middle; }
+    .top-arrow   { stroke: #c0742a; stroke-width: 1.8; fill: none; }
+    .top-arrow-fill { fill: #c0742a; }
+    @media (prefers-color-scheme: dark) {
+      .frame       { fill: #1e2330; stroke: #4a6fa5; }
+      .divider     { stroke: #4a6fa5; }
+      .val         { fill: #e2e8f0; }
+      .idx         { fill: #8899aa; }
+      .op          { fill: #8899aa; }
+      .ghost       { fill: #1e2330; stroke: #8899aa; }
+      .ghost-val   { fill: #aab4c0; }
+      .top-label   { fill: #d4884a; }
+      .top-arrow   { stroke: #d4884a; }
+      .top-arrow-fill { fill: #d4884a; }
+    }
+  </style>
+
+  <text x="30" y="30" class="op" style="text-anchor:start">capacidad: 8 | size: 4 | inicio: 2 | fin: 6</text>
+
+  <!-- inicio: apunta al primer elemento -->
+  <text x="193" y="92" class="top-label">inicio</text>
+  <path d="M193,98 L193,106" class="top-arrow"/>
+  <path d="M187,106 L193,114 L199,106 Z" class="top-arrow-fill"/>
+
+  <!-- fin: apunta al proximo slot libre -->
+  <text x="453" y="92" class="top-label">fin</text>
+  <path d="M453,98 L453,106" class="top-arrow"/>
+  <path d="M447,106 L453,114 L459,106 Z" class="top-arrow-fill"/>
+
+  <!-- buffer circular: 8 slots, ocupados 2-5 -->
+  <rect x="30" y="110" width="520" height="60" rx="8" class="frame"/>
+  <line x1="95"  y1="110" x2="95"  y2="170" class="divider"/>
+  <line x1="160" y1="110" x2="160" y2="170" class="divider"/>
+  <line x1="225" y1="110" x2="225" y2="170" class="divider"/>
+  <line x1="290" y1="110" x2="290" y2="170" class="divider"/>
+  <line x1="355" y1="110" x2="355" y2="170" class="divider"/>
+  <line x1="420" y1="110" x2="420" y2="170" class="divider"/>
+  <line x1="485" y1="110" x2="485" y2="170" class="divider"/>
+
+  <text x="192" y="147" class="val">20</text>
+  <text x="257" y="147" class="val">35</text>
+  <text x="322" y="147" class="val">48</text>
+  <text x="387" y="147" class="val">61</text>
+
+  <text x="62"  y="188" class="idx">0</text>
+  <text x="127" y="188" class="idx">1</text>
+  <text x="192" y="188" class="idx">2</text>
+  <text x="257" y="188" class="idx">3</text>
+  <text x="322" y="188" class="idx">4</text>
+  <text x="387" y="188" class="idx">5</text>
+  <text x="452" y="188" class="idx">6</text>
+  <text x="517" y="188" class="idx">7</text>
+
+  <!-- prepend(9): entra antes de inicio, sin desplazar nada -->
+  <rect x="97" y="112" width="61" height="56" rx="4" class="ghost"/>
+  <text x="127" y="150" class="ghost-val">9</text>
+
+  <!-- append(77): entra en fin, sin desplazar nada -->
+  <rect x="422" y="112" width="61" height="56" rx="4" class="ghost"/>
+  <text x="452" y="150" class="ghost-val">77</text>
+
+  <text x="30" y="215" class="op" style="text-anchor:start">prepend(9): (inicio-1+cap)%cap = 1 · O(1) sin desplazar</text>
+  <text x="30" y="235" class="op" style="text-anchor:start">append(77): fin%cap = 6 · O(1) sin desplazar</text>
+</svg>

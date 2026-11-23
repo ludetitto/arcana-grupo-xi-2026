@@ -12,16 +12,16 @@ alias:
 Una "pila" es como una pila de platos: el último que ponés es el primero que sacás.
 Resuelve problemas donde el orden de procesamiento debe invertirse o deshacerse (LIFO). Es una estructura con acceso restringido desde el tope.
 
-### Definición y propiedades
+### Definición / propiedades
 - Estructura LIFO (Last-In, First-Out)
 - Solo se puede acceder/modificar el elemento en el tope
 - No hay acceso directo a elementos intermedios
 - Invariante clave: el tope siempre representa el último elemento insertado
 
 ### Representación
-![](/attachments/grimorio/data-structures/stack.svg)
+![Pila con top en el último elemento, operaciones push y pop sobre el tope](stack.svg)
 
-Puede implementarse sobre [[array]], [[linked list]] o [[doubly linked list]]. La elección importa según el contexto: el array es más eficiente en caché y simple de implementar, pero requiere redimensionamiento si el tamaño no es fijo; la lista enlazada evita ese problema y hace push/pop en $O(1)$ sin amortizar, a costa de overhead por punteros y peor localidad de memoria. La lista doblemente enlazada no aporta ventaja real para una pila, ya que solo se opera en un extremo.
+Puede implementarse sobre [[array]], [[linked list]] o [[doubly linked list]]. La elección importa según el contexto: el array tiene mejor localidad de caché y es simple de implementar, pero requiere redimensionamiento si el tamaño no es fijo; la lista enlazada evita ese problema y hace push/pop en $O(1)$ sin amortizar, a costa de overhead por punteros y peor localidad de memoria. La lista doblemente enlazada no aporta ventaja real para una pila, ya que solo se opera en un extremo.
 
 ## 2. Operaciones y complejidad
 
@@ -37,23 +37,23 @@ Puede implementarse sobre [[array]], [[linked list]] o [[doubly linked list]]. L
 - `peek`: $O(1)$
 - Espacio: $O(n)$
 
-Es requerido que la pila respete esas complejidades para sus operaciones elementales.
+La pila debe respetar estas complejidades en sus operaciones elementales.
 
 > **Nota:** La complejidad será de $O(1)$ amortizado si está implementada con arreglo dinámico.
 
 ### Detalles operativos
 - Puede haber overflow (si hay límite de tamaño)
 - Puede haber underflow (hacer pop en pila vacía)
-- No permite búsqueda eficiente, ya que es `O(n)`
+- No permite búsqueda eficiente ni recorrido: no hay acceso a elementos intermedios, así que encontrar uno exige desapilar todo (y volver a apilarlo si hace falta conservar el estado), $O(n)$
 
 ## 3. Implementación
 
 ### Idea de implementación
 Mantener una colección donde solo se opera en un extremo.
-En arrays, se usa un índice como puntero al tope; en listas, el head actúa como tope.
+En arrays, se usa un índice como puntero al tope; en listas, el `head` actúa como tope.
 
 ### Invariantes
-- El puntero top siempre referencia el último elemento válido
+- El puntero tope siempre referencia el último elemento válido
 - Después de un push, el nuevo elemento es el tope
 - Después de un pop, el tope se actualiza correctamente
 - No acceder a la pila si está vacía
@@ -112,12 +112,16 @@ while not s.is_empty():
 - **vs [[linked list]].** la pila es una linked list con acceso restringido al tope. Esa restricción es una ventaja de diseño: garantiza el contrato LIFO e impide operaciones que romperían la semántica. Usá linked list cuando necesitás acceso o modificación en posiciones arbitrarias.
 - **vs [[deque]].** el deque es una generalización que incluye a la pila: permite insertar y eliminar en ambos extremos. Usar un deque como pila es válido, pero expone operaciones innecesarias que rompen la restricción LIFO. Preferí la pila cuando querés que la estructura garantice ese contrato por diseño.
 
-#### Ventajas
+### Ventajas / desventajas
+
+Ventajas:
+
 - Simplicidad extrema
-- Operaciones O(1) garantizadas
+- Operaciones $O(1)$ garantizadas
 - Modelo mental claro
 
-#### Desventajas
+Desventajas:
+
 - Muy limitada en operaciones
 - No permite acceso ni búsqueda eficiente
 - Puede ser demasiado restrictiva para algunos problemas
@@ -159,7 +163,8 @@ Implicancias:
 - Profundidades grandes pueden romper por límite de stack.
 - Tail recursion (cuando aplica) puede optimizarse a iteración y evitar crecimiento de pila (dependiendo del lenguaje/compilador).
 
-Posibilidad de implementar versiones persistentes
+#### Versiones persistentes
+
 Una pila persistente permite conservar versiones anteriores después de cada operación. Se logra con inmutabilidad + sharing estructural: cada push crea un nuevo nodo que apunta a la versión previa; pop devuelve la referencia anterior.
 
 Implicancias:
@@ -176,4 +181,4 @@ Implicancias:
 - Alternativa común: pilas thread-local para evitar compartir estado cuando es posible.
 
 ## 6. Referencias y recursos
-- [[COR2011]] - Chapter 10.1 Stacks and queues
+- [[COR2011]] - Chapter 10.1.

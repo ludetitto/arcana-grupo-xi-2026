@@ -29,7 +29,7 @@ Los casos base son:
 
 Cada celda se calcula una sola vez gracias al [[hash table#Idea de implementación]] `memo`. Las llamadas siguientes a la misma celda retornan directamente el valor almacenado.
 
-![](/attachments/bestiario/leetcode/0174-grafo-dependencias.svg)
+![Grafo de dependencias: cada celda depende de la de abajo y la de la derecha](0174-grafo-dependencias.svg)
 
 ## Código
 
@@ -100,7 +100,7 @@ Las celdas se calculan en el orden en que las requiere la recursión desde `(0,0
 memo[(0,0)] = min(max(6+2, 1),  max(5+2, 1))     = min(8, 7)   = 7
 ```
 
-![](/attachments/bestiario/leetcode/0174-top-down-primera-vs-cache.svg)
+![La misma celda en top-down: la primera vez recursa hasta el caso base, la segunda sale del memo](0174-top-down-primera-vs-cache.svg)
 
 Estado final del memo como matriz:
 
@@ -119,7 +119,7 @@ Sabemos que solo se puede ir hacia la derecha o hacia abajo, entonces podemos pr
 
 **Temporal:** $O(m \times n)$: cada celda se computa exactamente una vez y se guarda en `memo`.
 
-**Espacial:** $O(m \times n)$: el diccionario `memo` almacena como máximo `m×n` entradas, más $O(m+n)$ de profundidad de la pila de recursión.
+**Espacial:** $O(m \times n)$: el [[hash table]] `memo` almacena como máximo `m×n` entradas, más $O(m+n)$ de profundidad de la pila de recursión.
 
 ## Cuándo usar esta técnica
 

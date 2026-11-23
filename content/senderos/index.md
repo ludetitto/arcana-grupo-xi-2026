@@ -4,7 +4,7 @@ tags:
   - meta-hub
 ---
 
-![](/attachments/senderos-cover.png)
+![Portada de Senderos](senderos-cover.png)
 
 Acá se abren los Senderos principales: recorridos ya trazados para quienes prefieren avanzar con una lógica afinada y un propósito claro. Cada uno propone una secuencia de desafíos donde nada es casual y cada encuentro deja herramientas para el siguiente.
 
@@ -15,4 +15,5 @@ Elegí un sendero si necesitás guía. Abandonalo si encontrás algo más intere
 ## Los Senderos
 
 1. [[complejidad]]
-2. [[división y conquista]]
+2. [[la grieta de vaelthorn]]
+3. [[el martillo y la trampa]]

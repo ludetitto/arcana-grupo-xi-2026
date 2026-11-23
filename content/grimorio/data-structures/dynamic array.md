@@ -15,15 +15,15 @@ Un array dinámico es como una estantería de libros: se empieza con un mueble d
 
 Resuelve el problema de necesitar acceso inmediato por posición cuando la cantidad de elementos es incierta o crece con el tiempo.
 
-### Definición
+### Definición / propiedades
 
 Estructura que almacena datos de manera contigua y ajusta su capacidad en tiempo de ejecución. Sus propiedades clave:
 
-- **Acceso aleatorio**: cualquier elemento por índice en O(1).
+- **Acceso aleatorio**: cualquier elemento por índice en $O(1)$.
 - **Memoria contigua**: posiciones consecutivas garantizan localidad de caché.
 - **Capacidad flexible**: al llenarse, se redimensiona asignando un bloque más grande.
 - **Invariante**: elementos contiguos desde índice 0 hasta `size-1`, sin huecos; `size` nunca supera `capacidad`.
-- **Costo variable en inserción/eliminación**: O(1) amortizado al final, O(n) al principio o en el medio.
+- **Costo variable en inserción/eliminación**: al final, insertar es $O(1)$ amortizado y eliminar $O(1)$; al principio o en el medio, ambas son $O(n)$ en el array simple.
 
 ### Representación
 
@@ -33,11 +33,11 @@ El simple redimensiona al llenarse y es óptimo para agregar al final, pero inse
 
 #### Array dinámico
 
-![Array dinámico](array%20simple.svg)
+![Array dinámico](array-simple.svg)
 
 #### Array circular dinámico
 
-![Array dinámico](array%20circular.svg)
+![Array dinámico](array-circular.svg)
 
 ## 2. Operaciones y complejidad
 
@@ -46,7 +46,7 @@ El simple redimensiona al llenarse y es óptimo para agregar al final, pero inse
 - `append(elem)` agrega al final.
 - `prepend(elem)` agrega al principio.
 - `insert_at(i, elem)` inserta en posición específica.
-- `pop_back()` \ `pop_front()` elimina del final/inicio
+- `pop_back()` / `pop_front()` elimina del final/inicio
 - `delete_at(i)` elimina en posición específica.
 - `get_at(índice)` / `set_at(índice, elem)` acceso/modificación por índice.
 - `find(elem)` búsqueda lineal.
@@ -57,22 +57,26 @@ El simple redimensiona al llenarse y es óptimo para agregar al final, pero inse
 
 | Operacion                       | Array simple                    | Array circular                  |
 | ------------------------------- | ------------------------------- | ------------------------------- |
-| `append` / `pop_back`           | O(1) amortizado, O(n) peor caso | O(1) amortizado, O(n) peor caso |
-| `prepend` / `pop_front`         | O(n)                            | O(1) amortizado                 |
-| `insert_at` / `delete_at`       | O(n)                            | O(n)                            |
-| `get_at` / `set_at`             | O(1)                            | O(1)                            |
-| `find`                          | O(n)                            | O(n)                            |
-| `size` / `isEmpty` / `capacity` | O(1)                            | O(1)                            |
-| `clear`                         | O(n) / O(1)\*                   | O(n) / O(1)\*                   |
-| `resize` / `reserve`            | O(n) / O(1)                     | O(n) / O(1)\*                   |
+| `append`                        | $O(1)$ amortizado, $O(n)$ peor caso | $O(1)$ amortizado, $O(n)$ peor caso |
+| `pop_back`                      | $O(1)$†                           | $O(1)$†                           |
+| `prepend`                       | $O(n)$                            | $O(1)$ amortizado, $O(n)$ peor caso |
+| `pop_front`                     | $O(n)$                            | $O(1)$†                           |
+| `insert_at` / `delete_at`       | $O(n)$                            | $O(n)$                            |
+| `get_at` / `set_at`             | $O(1)$                            | $O(1)$                            |
+| `find`                          | $O(n)$                            | $O(n)$                            |
+| `size` / `isEmpty` / `capacity` | $O(1)$                            | $O(1)$                            |
+| `clear`                         | $O(n)$ / $O(1)$\*                   | $O(n)$ / $O(1)$\*                   |
+| `resize` / `reserve`            | $O(n)$ / $O(1)$\*                   | $O(n)$ / $O(1)$\*                   |
 
 \*depende de si hay destructores o se necesita copiar.
 
-**Espacio:** O(n) en ambos casos.
+†vale sin _shrinking_ automático: extraer no redimensiona ni copia elementos, solo decrementa `size` (en el circular, además avanza `inicio`). Con _shrinking_ ([[#Variantes]]), una extracción puede disparar una copia, y pasa a $O(1)$ amortizado, $O(n)$ peor caso.
+
+**Espacio:** $O(n)$ en ambos casos.
 
 ### Detalles operativos
 
-La redimensión ocurre cuando `size == capacidad` y cuesta O(n) → por eso se duplica la capacidad en vez de crecer de a uno, lo que amortiza el costo a O(1) por inserción. Insertar o eliminar en posición `i` desplaza `n-i` elementos. La memoria reservada pero no usada nunca se libera sola: es responsabilidad del programador reducir la capacidad explícitamente.
+La redimensión ocurre cuando `size == capacidad` y cuesta $O(n)$ → por eso se duplica la capacidad en vez de crecer de a uno, lo que amortiza el costo a $O(1)$ por inserción. Insertar o eliminar en posición `i` desplaza `n-i` elementos. Sin _shrinking_, la memoria reservada pero no usada nunca se libera sola: es responsabilidad del programador reducir la capacidad explícitamente.
 
 El array circular evita desplazamientos en los extremos con aritmética modular: el índice físico de la posición lógica `i` es `(inicio + i) % capacidad`. El precio es un problema de ambigüedad: si `inicio == fin`, ¿el array está vacío o lleno? La solución estándar es sacrificar una celda o mantener un contador separado.
 
@@ -80,7 +84,7 @@ El array circular evita desplazamientos en los extremos con aritmética modular:
 
 ### Idea de implementación
 
-Se mantiene un bloque contiguo en _heap_ con dos variables: `size` (elementos almacenados) y `capacidad` (tamaño máximo reservado). Cuando `size == capacidad`, se aplica redimensionamiento geométrico: la capacidad se multiplica por un factor fijo (típicamente ×2).
+Se mantiene un bloque contiguo en _heap_ con dos variables: `size` (elementos almacenados) y `capacidad` (tamaño máximo reservado). Cuando `size == capacidad`, se aplica redimensionamiento geométrico: la capacidad se multiplica por un factor fijo (típicamente $2$).
 
 ### Invariantes
 
@@ -89,7 +93,7 @@ Se mantiene un bloque contiguo en _heap_ con dos variables: `size` (elementos al
 - Nunca se accede fuera del rango válido.
 - Al eliminar en posición `i`, todos los elementos a la derecha se desplazan para mantener la contigüidad.
 
-### Ejemplos de código
+### Ejemplo de código
 
 ```python title="Array dinámico en python"
 class ArrayDinamico:
@@ -152,31 +156,34 @@ for i in range(arr.size):
 ### Casos de uso
 
 - **Tamaño variable o impredecible:** cuando la cantidad de elementos crece con el tiempo.
-- **Lectura intensiva:** acceso aleatorio frecuente por índice en O(1).
-- **Implementación de pilas:** operaciones LIFO solo en el extremo final: `append`/`pop_back` amortizado O(1).
+- **Lectura intensiva:** acceso aleatorio frecuente por índice en $O(1)$.
+- **Implementación de pilas:** operaciones LIFO solo en el extremo final: `append` $O(1)$ amortizado, `pop_back` $O(1)$.
 
 ### Cuándo NO usarlo
 
 - Tamaño conocido de antemano → usar array estático (sin costo de redimensión).
-- Inserciones/eliminaciones frecuentes en el medio → es preferible lista enlazada.
+- Inserciones o eliminaciones frecuentes en el medio → es preferible una lista simplemente enlazada si ya se dispone de la referencia al nodo anterior. Por ejemplo, durante un recorrido se puede insertar después del nodo actual.
 - Memoria muy fragmentada → es preferible lista enlazada (no requiere bloque contiguo).
 
-### Comparaciones con Alternativas
+### Comparaciones
 
-|                            | Array dinámico  | array estático | lista enlazada |
-| -------------------------- | --------------- | -------------- | -------------- |
-| Acceso por índice          | O(1)            | O(1)           | O(n)           |
-| Inserción al final         | O(1) amortizado | -              | O(1)           |
-| Inserción en medio         | O(n)            | -              | O(1)           |
-| Localidad de caché         | ✓ excelente     | ✓ excelente    | ✗ fragmentada  |
-| Tamaño flexible            | ✓               | ✗              | ✓              |
-| Memoria contigua requerida | ✓               | ✓              | ✗              |
+|                                                    | Array dinámico    | Array estático | Lista simplemente enlazada             |
+| -------------------------------------------------- | ----------------- | -------------- | -------------------------------------- |
+| Acceso por índice                                  | $O(1)$            | $O(1)$         | $O(n)$                                 |
+| Inserción al final                                 | $O(1)$ amortizado | N/A            | $O(1)$ con `tail`, $O(n)$ sin `tail`   |
+| Inserción en medio por índice                      | $O(n)$            | N/A            | $O(n)$                                 |
+| Inserción en medio con la posición ya localizada   | $O(n)$            | N/A            | $O(1)$ con referencia al nodo anterior |
+| Eliminación en medio por índice                    | $O(n)$            | N/A            | $O(n)$                                 |
+| Eliminación en medio con la posición ya localizada | $O(n)$            | N/A            | $O(1)$ con referencia al nodo anterior |
+| Localidad de caché                                 | ✓ excelente       | ✓ excelente    | ✗ fragmentada                          |
+| Tamaño flexible                                    | ✓                 | ✗              | ✓                                      |
+| Memoria contigua requerida                         | ✓                 | ✓              | ✗                                      |
 
 ### Ventajas / desventajas
 
-**Ventajas:** acceso O(1) por índice, excelente localidad de caché, `append` amortizado O(1), no requiere conocer el tamaño de antemano.
+**Ventajas:** acceso $O(1)$ por índice, excelente localidad de caché, `append` amortizado $O(1)$, no requiere conocer el tamaño de antemano.
 
-**Desventajas:** redimensión O(n) al llenarse, inserción/eliminación en el medio O(n), requiere bloque contiguo en memoria, puede desperdiciar espacio (`capacidad > size`), redimensionar invalida iteradores existentes.
+**Desventajas:** redimensión $O(n)$ al llenarse, inserción/eliminación en el medio $O(n)$, requiere bloque contiguo en memoria, puede desperdiciar espacio (`capacidad > size`), redimensionar invalida iteradores existentes.
 
 ### Señales de reconocimiento
 
@@ -189,8 +196,8 @@ for i in range(arr.size):
 
 ### Variantes
 
-- Factor de crecimiento variable (×1.5 o ×2): balancea uso de memoria vs. frecuencia de copias; con ×2 el total de copias no supera 2n para n inserciones.
-- _Shrinking_: reduce capacidad al bajar del 25% de ocupación para evitar fragmentación externa.
+- Factor de crecimiento variable ($1.5$ o $2$): balancea uso de memoria vs. frecuencia de copias; con factor $2$ el total de copias no supera $2n$ para $n$ inserciones.
+- _Shrinking_: cuando la ocupación baja del 25%, la capacidad se reduce a la mitad. El umbral no es 50% porque, justo en el límite, alternar `append` y `pop_back` dispararía una copia en cada operación: el `append` duplica la capacidad y el `pop_back` siguiente la vuelve a reducir. Con 25%, tras reducir el array queda ocupado a la mitad, así que hacen falta $\Theta(n)$ operaciones antes de la próxima copia y el costo sigue siendo $O(1)$ amortizado.
 - Buffer circular sobre array dinámico: base de implementaciones eficientes de [[deque]].
 
 ### Relación con otras estructuras
@@ -201,7 +208,7 @@ Es la base de `ArrayList` (Java), `vector` (C++) y `list` (Python), construida s
 
 **Invalidación de punteros**: un resize mueve el buffer completo a una nueva dirección; en C/C++ cualquier puntero al buffer anterior queda inválido. `reserve()` previene reallocs si el tamaño final es conocido.
 
-**Persistencia**: cada modificación requiere copiar el array completo (O(n)), a diferencia de estructuras persistentes como la pila enlazada.
+**Persistencia**: cada modificación requiere copiar el array completo ($O(n)$), a diferencia de estructuras persistentes como la pila enlazada.
 
 **Concurrencia**: un resize mientras otro hilo itera produce comportamiento indefinido. La alternativa habitual son estructuras segmentadas ([ConcurrentVector](https://learn.microsoft.com/en-us/cpp/parallel/concrt/reference/concurrent-vector-class?view=msvc-170)) que evitan mover toda la memoria.
 

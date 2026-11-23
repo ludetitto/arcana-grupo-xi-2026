@@ -21,7 +21,7 @@ No buscás por posición ni por índice numérico: buscás por una **clave**
 Un Map funciona exactamente así: mantiene asociaciones entre **claves** y **valores**.
 Su objetivo es permitir recuperar información **a partir de una clave** de manera clara y eficiente.
 
-### Definición y propiedades
+### Definición / propiedades
 
 **Definición formal:** Un Map es un tipo de dato abstracto que mantiene
 una colección de pares **clave→valor** bajo ciertas reglas fundamentales:
@@ -40,12 +40,12 @@ una colección de pares **clave→valor** bajo ciertas reglas fundamentales:
 
 ### Representación
 
-![](/attachments/grimorio/data-structures/map.svg)
+![Map de pares clave-valor con las operaciones find, insert y delete](map.svg)
 
 Un Map es una abstracción lógica, por lo que puede implementarse de diferentes maneras:
 
-- **HashMap:** Utiliza funciones hash para lograr un acceso promedio de O(1).
-- **TreeMap:** Usa árboles balanceados para mantener las claves ordenadas, con operaciones O(log n).
+- **HashMap:** Utiliza funciones hash para lograr un acceso promedio de $O(1)$.
+- **TreeMap:** Usa árboles balanceados para mantener las claves ordenadas, con operaciones $O(\log n)$.
 - **Lista o array de pares:** Implementación simple, útil para conjuntos pequeños.
 
 Lógicamente, cada implementación ofrece distintos compromisos entre:
@@ -65,7 +65,7 @@ la de gestionar asociaciones **clave→valor**.
 ### Operaciones principales
 
 - **`insert(key, value)`:** Agrega un nuevo par clave→valor. Si la clave ya existe, reemplaza el valor anterior.
-- **`find(key)`:** Retorna el valor asociado a una clave. Si no existe, retorna un valor nulo o centinela según la implementación (no necesariamente lanza una excepción).
+- **`find(key)`:** Retorna el valor asociado a una clave. Si no existe, retorna un valor nulo o centinela, o lanza una excepción, según la implementación.
 - **`delete(key)`:** Elimina un par clave→valor. Si la clave no existe, no tiene efecto.
 - **`update(key, value)`:** Reemplaza el valor asociado a una clave existente. En muchas implementaciones es equivalente a `insert`: si la clave no existe, el comportamiento depende del contrato definido (puede insertar, ignorar o lanzar error).
 
@@ -73,15 +73,22 @@ la de gestionar asociaciones **clave→valor**.
 
 La complejidad de un Map depende de su implementación concreta.
 
-| Implementación | Inserción                      | Búsqueda                       | Eliminación                    |
-| -------------- | ------------------------------ | ------------------------------ | ------------------------------ |
-| HashMap        | O(1) promedio / O(n) peor caso | O(1) promedio / O(n) peor caso | O(1) promedio / O(n) peor caso |
-| TreeMap        | O(log n)                       | O(log n)                       | O(log n)                       |
-| Lista / Array  | O(1) / O(n) según estrategia   | O(n)                           | O(n)                           |
+| Implementación | Inserción                          | Búsqueda                           | Eliminación                        |
+| -------------- | ---------------------------------- | ---------------------------------- | ---------------------------------- |
+| HashMap        | $O(1)$ promedio / $O(n)$ peor caso | $O(1)$ promedio / $O(n)$ peor caso | $O(1)$ promedio / $O(n)$ peor caso |
+| TreeMap        | $O(\log n)$                        | $O(\log n)$                        | $O(\log n)$                        |
+| Lista / Array  | $O(n)$                             | $O(n)$                             | $O(n)$                             |
 
-> **Nota sobre Lista/Array:** la inserción es O(1) si siempre se agrega al final sin verificar duplicados; es O(n) si primero se busca la clave para evitarlos. La elección depende del contrato: un Map que garantiza unicidad de claves debe hacer la búsqueda previa.
+> **Nota sobre Lista/Array:** la inserción es $O(n)$ porque se debe hacer una búsqueda previa de la clave para garantizar su unicidad.
 
 > No existe una única complejidad para los Maps. El rendimiento depende de cómo se implemente internamente.
+
+### Detalles operativos
+
+- **Clave duplicada:** `insert`/`update` sobrescriben el valor existente; nunca coexisten dos entradas con la misma clave.
+- **Clave inexistente:** `find` retorna un valor nulo o centinela, o lanza una excepción; `delete` no tiene efecto.
+- **Orden:** no garantizado salvo que la implementación lo provea explícitamente (ej. `TreeMap` ordena por clave, `HashMap` no garantiza orden).
+- **Costo oculto:** en implementaciones basadas en tabla hash, superar el factor de carga dispara un rehash que reinserta todas las claves, rompiendo puntualmente la complejidad amortizada.
 
 ---
 
@@ -105,7 +112,7 @@ Independientemente de la implementación elegida, el flujo conceptual de las ope
 - **find(key):**
   1. Buscar la clave.
   2. Si existe → retornar valor asociado.
-  3. Si no → retornar valor nulo o centinela (el contrato exacto depende de la implementación).
+  3. Si no → retornar valor nulo o centinela, o lanzar excepción (el contrato exacto depende de la implementación).
 
 - **delete(key):**
   1. Buscar la clave.
@@ -130,7 +137,7 @@ Estas condiciones deben cumplirse siempre:
 
 ---
 
-### Ejemplo de código (Python)
+### Ejemplo de código
 
 Implementación mínima de un **Map** usando una lista de pares clave→valor:
 
@@ -151,6 +158,8 @@ class Map:
         for k, v in self.data:
             if k == key:
                 return v
+        # Si no encuentra, devuelve nulo o centinela, o lanza excepción.
+        # En este ejemplo lanza una excepción.
         raise KeyError("Clave no encontrada")
 
 
@@ -166,6 +175,9 @@ class Map:
             if k == key:
                 self.data[i] = (key, value)
                 return
+        # Si la clave no existiera,
+        # puede insertar, ignorar o lanzar error, según el contrato.
+        # En este ejemplo, lanza una excepción.
         raise KeyError("Clave no encontrada")
 ```
 
@@ -226,12 +238,12 @@ No conviene usarlo cuando:
 
 | Estructura       | Ventaja frente al Map                                       | Desventaja frente al Map                        |
 | ---------------- | ----------------------------------------------------------- | ----------------------------------------------- |
-| Array            | Menor uso de memoria y acceso por índice real               | Buscar por contenido cuesta O(n)                |
-| Lista enlazada   | Inserciones simples y flexibles                             | Búsqueda lineal O(n)                            |
+| Array            | Menor uso de memoria y acceso por índice real               | Buscar por contenido cuesta $O(n)$                |
+| Lista enlazada   | Inserciones simples y flexibles                             | Búsqueda lineal $O(n)$                            |
 | Árbol balanceado | Mantiene elementos ordenados y permite recorrerlos en orden | Más complejo de implementar como TDA base       |
 | [[set]]          | Ideal cuando solo importa saber si una clave existe         | No almacena valores asociados                   |
 
-### Ventajas / Desventajas
+### Ventajas / desventajas
 
 | Ventajas                                           | Desventajas                                                          |
 | -------------------------------------------------- | -------------------------------------------------------------------- |
@@ -263,7 +275,7 @@ Hay varias pistas en un problema que sugieren que un Map puede ser la estructura
 ### Relación con otras estructuras
 
 - Respecto a su relación con otras estructuras, los mapas dependen conceptualmente de:
-  - [[hash table]], la implementación más común para lograr acceso promedio O(1).
+  - [[hash table]], la implementación más común para lograr acceso promedio $O(1)$.
   - [[array]], como base para almacenar datos (especialmente en hashing).
   - [[linked list]], usadas en manejo de colisiones.
   - Árboles, para mantener orden y garantizar complejidad logarítmica.
@@ -283,8 +295,8 @@ Esto los convierte en una especie de “estructura compuesta”, que reutiliza i
 
 ### Libros
 
-- [[COR2011]] - Cap. 11: Hash Tables _(implementación concreta del Map mediante hashing)_.
-- [[SED2011]] - Cap. 3: Searching _(Maps con hashing y árboles balanceados; independiente del lenguaje)_.
+- [[COR2011]] - Chapter 11.
+- [[SED2011]] - Chapter 3.
 
 ### Visualizaciones
 

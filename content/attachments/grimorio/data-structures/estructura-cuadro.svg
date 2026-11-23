@@ -1,0 +1,39 @@
+<svg width="320" height="300" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    text { font-family: 'Courier New', Courier, monospace; }
+    .frame       { fill: #f5f7fa; stroke: #9baec8; stroke-width: 1.8; }
+    .divider     { stroke: #9baec8; stroke-width: 1; }
+    .val         { font-size: 20px; font-weight: 700; fill: #1a1a2e; text-anchor: middle; }
+    .val-sm      { font-size: 15px; font-weight: 700; fill: #1a1a2e; text-anchor: middle; }
+    .op          { font-size: 13px; font-weight: 700; fill: #777777; text-anchor: middle; }
+    @media (prefers-color-scheme: dark) {
+      .frame       { fill: #1e2330; stroke: #4a6fa5; }
+      .divider     { stroke: #4a6fa5; }
+      .val         { fill: #e2e8f0; }
+      .val-sm      { fill: #e2e8f0; }
+      .op          { fill: #8899aa; }
+    }
+  </style>
+
+  <!-- struct Punto3D: nombre + campos (campo | tipo), mismo patron de tabla que map.svg -->
+  <rect x="60" y="60" width="200" height="190" rx="10" class="frame"/>
+  <line x1="60"  y1="100" x2="260" y2="100" class="divider"/>
+  <line x1="60"  y1="130" x2="260" y2="130" class="divider"/>
+  <line x1="150" y1="130" x2="150" y2="250" class="divider"/>
+  <line x1="60"  y1="170" x2="260" y2="170" class="divider"/>
+  <line x1="60"  y1="210" x2="260" y2="210" class="divider"/>
+
+  <text x="160" y="85" class="val" style="font-size:22px">Punto3D</text>
+
+  <text x="105" y="120" class="op">campo</text>
+  <text x="205" y="120" class="op">tipo</text>
+
+  <text x="105" y="155" class="val-sm">x</text>
+  <text x="205" y="155" class="val-sm">float</text>
+
+  <text x="105" y="195" class="val-sm">y</text>
+  <text x="205" y="195" class="val-sm">float</text>
+
+  <text x="105" y="235" class="val-sm">z</text>
+  <text x="205" y="235" class="val-sm">float</text>
+</svg>
