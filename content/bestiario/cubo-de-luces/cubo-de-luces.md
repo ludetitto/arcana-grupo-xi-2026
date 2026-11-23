@@ -1,6 +1,7 @@
 ---
 title: 'Cubo de Luces'
 tags:
+  - cubo-de-luces
   - bestia
   - fuerza-bruta
   - backtracking
@@ -34,27 +35,50 @@ A primera vista, pareciera que el problema se resuelve apretando los botones de 
 
 ## Ejemplo concreto
 
-Si tomamos n = 2 y la siguiente configuración inicial:
+Si tomamos n = 4 y la siguiente configuración inicial:
 
 ```
-0 1
-1 0
+0 1 1 0
+1 0 0 1
+1 0 0 1
+0 1 1 0
 ```
 
-Para este caso, la mínima cantidad de pulsaciones de botones necesarias para encender todas las luces es 2. Una posible secuencia de pulsaciones sería:
+Para este caso, la mínima cantidad de pulsaciones de botones necesarias para encender todas las luces es 4. Una posible secuencia de pulsaciones sería:
 
-1. Pulsar el botón de la primera fila (cambia a 1 0)
-
-```
-1 0
-1 0
-```
-
-2. Pulsar el botón de la segunda columna (cambia a 1 1)
+1. Pulsar el botón de la primera fila.
 
 ```
-1 1
-1 1
+1 0 0 1
+1 0 0 1
+1 0 0 1
+0 1 1 0
+```
+
+2. Pulsar el botón de la última fila.
+
+```
+1 0 0 1
+1 0 0 1
+1 0 0 1
+1 0 0 1
+```
+
+3. Pulsar el botón de la segunda columna.
+
+```
+1 1 0 1
+1 1 0 1
+1 1 0 1
+1 1 0 1
+```
+4. Pulsar el botón de la tercer columna.
+
+```
+1 1 1 1
+1 1 1 1
+1 1 1 1
+1 1 1 1
 ```
 
 ---
