@@ -6,83 +6,202 @@ tags:
 ---
 
 ## Técnicas utilizadas
-Búsqueda por [[fuerza bruta]] con fórmula cerrada (cuadrática): en lugar de sumar los números uno a uno, se usa la [[fórmula de Gauss]] para calcular sumas de series consecutivas en $O(1)$. Esto permite evaluar cada candidato `(h, N)` de forma directa y eficiente.
+
+Backtracking: se decide de a un botón por vez si se pulsa o no, y cada rama se descarta en cuanto deja una luz apagada que ya no se puede arreglar (poda por factibilidad). No se poda por cota (ver la comparación con branch and bound).
 
 ## Idea de la solución
-La suma de los números a la izquierda de h es la suma de 1 hasta h−1, y la suma a la derecha es la suma de h+1 hasta N. Ambas se calculan con la fórmula de Gauss:
 
-Suma izquierda:
-$$
-gauss(h−1) = (h−1) \times h / 2
-$$
-Suma derecha:
-$$
-gauss(N) − gauss(h) = N \times (N+1)/2 − h \times (h+1)/2
-$$
+Como en [[cubo-de-luces-fuerza-bruta|la solución por fuerza bruta]] del [[cubo-de-luces|Cubo de Luces]], alcanza con decidir para cada botón si se pulsa (1) o no (0). Llamamos $f[i]$ a la decisión sobre la fila i y $c[j]$ a la decisión sobre la columna j.
 
-El algoritmo itera sobre todos los valores posibles de `N` (el tamaño de la calle), y para cada `N` prueba todas las posiciones h desde 1 hasta N. Si ambas sumas coinciden, se registra el par como solución.
+La clave es que la luz $(i, j)$ termina encendida si y solo si $matriz[i][j] \oplus f[i] \oplus c[j] = 1$. Entonces, **apenas se deciden $f[i]$ y $c[j]$ ya sabemos cómo queda la luz $(i, j)$**. Si queda apagada, ninguna decisión posterior la arregla y la rama se descarta.
+
+### Operaciones del esquema
+
+- **Solución:** los $2n$ botones están decididos.
+- **Extender:** el próximo botón, en un orden fijo, se pulsa (1) o no (0).
+- **Factible:** las luces que quedan decididas con esa elección terminan encendidas.
+- **Registrar:** agregar la decisión al final del [[array|arreglo]] `decisiones`.
+- **Borrar:** sacar la última decisión.
+
+A diferencia del esquema general, al encontrar una solución no se corta la búsqueda. El problema pide la mínima cantidad de pulsaciones, así que se recorren todas las ramas factibles y se guarda la mejor. Si ninguna llega a ser solución, se devuelve -1.
+
+### Orden de decisión
+
+1. **Primero $f[0]$.** No hay ninguna luz decidida, así que las dos opciones son factibles.
+2. **Después $c[0], \dots, c[n-1]$.** Al decidir $c[j]$ queda decidida la luz $(0, j)$, así que solo una opción es factible.
+3. **Por último $f[1], \dots, f[n-1]$.** Al decidir $f[i]$ queda decidida la fila i entera, y a lo sumo una opción es factible.
+
+Una vez elegido $f[0]$ todo queda forzado: el árbol tiene a lo sumo 2 ramas completas, en lugar de las $2^{2n}$ combinaciones de la fuerza bruta.
+
+Como el orden es fijo, `decisiones` guarda los botones en ese orden: `decisiones[0]` es $f[0]$, `decisiones[1 + j]` es $c[j]$ y `decisiones[n + i]` es $f[i]$. Su largo indica qué botón toca decidir.
 
 ## Código
 
 ```python
-def gauss(n):
-    return n * (n + 1) // 2
+def minimo_pulsaciones_botones(n, matriz):
+    mejor = float('inf')
 
-soluciones = []
-N = 1
-while len(soluciones) < 10:
-    for h in range(1, N + 1):
-        suma_izq = gauss(h - 1)
-        suma_der = gauss(N) - gauss(h)
-        if suma_izq == suma_der:
-            soluciones.append((h, N))
-    N += 1
+    def es_factible(decisiones, x):
+        paso = len(decisiones)
+        if paso == 0:                     # fila 0: todavía no hay luces decididas
+            return True
+        if paso <= n:                     # columna j: queda decidida la luz (0, j)
+            j = paso - 1
+            return matriz[0][j] ^ decisiones[0] ^ x == 1
+        i = paso - n                      # fila i: queda decidida la fila entera
+        return all(matriz[i][j] ^ x ^ decisiones[1 + j] == 1 for j in range(n))
 
-for h, N in soluciones:
-    print(f"{h:10}{N:10}")
+    def backtracking(decisiones):
+        nonlocal mejor
+        if len(decisiones) == 2 * n:      # es solución: todos los botones decididos
+            mejor = min(mejor, sum(decisiones))
+            return
+        for x in (0, 1):                  # extender: pulsar o no el próximo botón
+            if es_factible(decisiones, x):
+                decisiones.append(x)      # registrar
+                backtracking(decisiones)
+                decisiones.pop()          # borrar
+
+    backtracking([])
+    return mejor if mejor != float('inf') else -1
 ```
 
 ## Traza de ejemplo
 
-Buscamos la primera solución, con N creciente:
+### Caso con solución
 
-|  N  |  h  | Suma izq | Suma der |          ¿Igual?         |
-|-----|-----|----------|----------|--------------------------|
-|   1 |   1 |        0 |        0 | ✓ (trivial, se descarta) |
-| ... | ... |      ... |      ... |                          |
-|  8  |  1  |        0 |       35 |                        ✗ |
-|  8  |  2  |        1 |       33 |                        ✗ |
-|  8  |  3  |        3 |       30 |                        ✗ |
-|  8  |  4  |        6 |       26 |                        ✗ |
-|  8  |  5  |       10 |       21 |                        ✗ |
-|  8  |  6  |       15 |       15 |                        ✓ |
+Matriz inicial de $3 \times 3$:
 
-Primera solución encontrada: (6, 8).
-> Nota: el caso h=1 con N=1 da suma 0 en ambos lados, pero es trivial. Si se quiere excluir, alcanza con pedir h > 1 o N > 1.
+```
+0 1 1
+1 0 0
+0 1 1
+```
 
+**Rama $f[0] = 0$.** No se pulsa la fila 0. La luz $(0, 0)$ está apagada, así que solo es factible $c[0] = 1$. Las luces $(0, 1)$ y $(0, 2)$ están encendidas, así que solo son factibles $c[1] = 0$ y $c[2] = 0$. Se pulsa la columna 0:
+
+```
+1 1 1
+0 0 0
+1 1 1
+```
+
+La fila 1 está toda apagada: $f[1] = 0$ no es factible y solo sirve $f[1] = 1$. Se pulsa la fila 1:
+
+```
+1 1 1
+1 1 1
+1 1 1
+```
+
+La fila 2 ya está encendida: solo sirve $f[2] = 0$. Es solución con 2 pulsaciones y el mínimo pasa de $\infty$ a 2. Se borran las decisiones y se vuelve atrás hasta $f[0]$.
+
+**Rama $f[0] = 1$.** Se pulsa la fila 0:
+
+```
+1 0 0
+1 0 0
+0 1 1
+```
+
+Ahora la fila 0 fuerza $c = [0, 1, 1]$. Se pulsan las columnas 1 y 2:
+
+```
+1 1 1
+1 1 1
+0 0 0
+```
+
+La fila 1 fuerza $f[1] = 0$ y la fila 2 fuerza $f[2] = 1$. Se pulsa la fila 2:
+
+```
+1 1 1
+1 1 1
+1 1 1
+```
+
+Es solución con 4 pulsaciones, que no mejora el mínimo. El algoritmo devuelve 2 tras 13 llamadas, contra los $2^6 = 64$ candidatos de la fuerza bruta.
+
+### Caso sin solución
+
+Matriz inicial de $2 \times 2$:
+
+```
+0 1
+1 1
+```
+
+**Rama $f[0] = 0$.** La fila 0 fuerza $c = [1, 0]$. Se pulsa la columna 0:
+
+```
+1 1
+0 1
+```
+
+La fila 1 queda `0 1`: pulsándola queda `1 0` y sin pulsarla queda `0 1`. Ninguna opción es factible y se vuelve atrás.
+
+**Rama $f[0] = 1$.** Se pulsa la fila 0 y luego la fila 0 fuerza $c = [0, 1]$:
+
+```
+1 1
+1 0
+```
+
+La fila 1 queda `1 0`: otra vez ninguna opción es factible.
+
+Ninguna rama llega a ser solución y el algoritmo devuelve -1. Cada botón invierte 0 o 2 de estas cuatro luces, así que la paridad de las encendidas nunca cambia y no pueden quedar las cuatro encendidas.
 
 ## Complejidad
 
 ### Temporal
-$O(N_{max}^2)$ donde $N_{max}$ es el valor de la última calle encontrada. Para cada N se prueban hasta N valores de h, y cada evaluación es $O(1)$ gracias a Gauss. $N_{max}$ no es un parámetro controlable: está determinado por la décima solución, que es grande debido al crecimiento exponencial de las soluciones. En la práctica el programa termina rápido porque solo se piden 10 soluciones, pero el algoritmo no escala bien si se piden muchas más.
+$O(n^2)$
 
+En el peor caso, un backtracking tiene la misma complejidad que la fuerza bruta, $O(2^{2n} \cdot n^2)$, porque si las podas no actúan recorre todas las combinaciones. Acá pasaría con un orden desfavorable, por ejemplo decidir todas las filas antes que cualquier columna.
+
+Con el orden elegido, ese peor caso no ocurre. Después de $f[0]$, cada botón tiene a lo sumo una opción factible, incluso cuando no hay solución. El árbol tiene entonces a lo sumo 2 ramas de $2n$ niveles:
+
+- Cada columna revisa una luz, $O(1)$, y en total suman $O(n)$.
+- Cada fila revisa $n$ luces, $O(n)$, y en total suman $O(n^2)$.
+
+El total es $O(n^2)$, que no se puede mejorar porque hay que mirar las $n^2$ luces al menos una vez.
 
 ### Espacial
-$O(1)$ auxiliar (más $O(10)$ para guardar los resultados), ya que no se almacena ninguna estructura proporcional a N.
+$O(n^2)$
+
+El tablero ocupa $O(n^2)$. El arreglo `decisiones` y la [[stack|pila]] de recursión, de profundidad $2n$, ocupan $O(n)$. No se copia el tablero.
 
 ## Cuándo usar esta técnica
 
-### Favorable cuando
-- Se buscan pocas soluciones entre muchos candidatos.
-- Existe una fórmula cerrada que evita iterar elemento a elemento.
-- El espacio de búsqueda es pequeño o las soluciones aparecen pronto.
+### Contexto favorable
+
+- Cuando las restricciones se pueden verificar con la solución a medio armar.
+- Cuando existe un orden de decisión que hace actuar las podas desde el principio.
+- Para $n$ grande: resuelve hasta $n = 1000$.
 
 ### Limitaciones
-- No escala bien si se piden muchas soluciones: los valores de h y N crecen rápidamente (siguiendo una recurrencia ligada a [[ecuaciones de Pell]]), y el bucle externo debe avanzar hasta N muy grandes.
-- Comparado con una solución basada en la recurrencia matemática, esta versión hace trabajo redundante: evalúa muchos pares (h, N) que no son solución.
 
-## Comparación con la solución recursiva
-Una solución que explota la ecuación de Pell genera cada par directamente a partir del anterior en $O(1)$ por solución, con complejidad total $O(k)$ para k soluciones. La fuerza bruta cuadrática es más fácil de entender y verificar, pero menos eficiente para k grande.
+- **Depende del orden.** Con otro orden, el mismo algoritmo vuelve a ser exponencial.
+- **Es más difícil de verificar.** Un error en las podas puede descartar soluciones válidas sin que se note.
+### Comparación con fuerza bruta
+
+| | Fuerza bruta | Backtracking |
+|---|---|---|
+| Cuándo verifica | Al final, con la combinación completa | En cada decisión |
+| Candidatos explorados | Siempre $2^{2n}$ | A lo sumo 2 ramas completas |
+| Tiempo | $O(2^{2n} \cdot n^2)$ | $O(n^2)$ con el orden elegido |
+| Espacio adicional | $O(n^2)$ por la copia del tablero | $O(n)$ |
+| Sirve para $n \le 1000$ | No | Sí |
+
+La fuerza bruta es más simple y sirve como referencia en tableros chicos; el backtracking resuelve el problema completo.
+
+### Comparación con branch and bound
+
+Branch and bound agrega una poda por cota: en cada nodo estima la menor cantidad de pulsaciones que podría alcanzar la rama y la descarta si no puede mejorar el mínimo conocido. En este problema no conviene:
+
+- **Una cota útil es cara.** Estimar cuántas pulsaciones faltan requiere mirar los botones no decididos y sus luces, $O(n)$ o más por nodo. Con unos $4n$ nodos, solo las cotas ya cuestan $O(n^2)$, y con una cota más precisa el total sube a $O(n^3)$.
+- **No hay ramas que cortar.** La poda por factibilidad ya deja a lo sumo 2 ramas. La primera no se puede podar porque todavía no hay un mínimo, así que la cota solo podría cortar parte de la segunda, sin cambiar el $O(n^2)$.
+
+Branch and bound conviene cuando hay muchas soluciones válidas y una buena cota descarta la mayoría. Acá la poda por factibilidad ya hace ese trabajo.
 
 ## Referencias
-- N/A
+- [Problema original (OIA)](https://www.oia.unsam.edu.ar/wp-content/uploads/2021/03/cubo.pdf)
