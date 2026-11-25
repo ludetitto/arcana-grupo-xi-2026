@@ -15,6 +15,8 @@ Como en [[cubo-de-luces-fuerza-bruta|la solución por fuerza bruta]] del [[cubo-
 
 La clave es que la luz $(i, j)$ termina encendida si y solo si $matriz[i][j] \oplus f[i] \oplus c[j] = 1$. Entonces, **apenas se deciden $f[i]$ y $c[j]$ ya sabemos cómo queda la luz $(i, j)$**. Si queda apagada, ninguna decisión posterior la arregla y la rama se descarta.
 
+![](/attachments/bestiario/oia/cubo-de-luces-pulsaciones.svg)
+
 ### Operaciones del esquema
 
 - **Solución:** los $2n$ botones están decididos.
