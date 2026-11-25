@@ -20,7 +20,7 @@ La clave es que la luz $(i, j)$ termina encendida si y solo si $matriz[i][j] \op
 - **Solución:** los $2n$ botones están decididos.
 - **Extender:** el próximo botón, en un orden fijo, se pulsa (1) o no (0).
 - **Factible:** las luces que quedan decididas con esa elección terminan encendidas.
-- **Registrar:** agregar la decisión al final del [[array|arreglo]] `decisiones`.
+- **Registrar:** agregar la decisión al final del [[array|arreglo]] decisiones.
 - **Borrar:** sacar la última decisión.
 
 A diferencia del esquema general, al encontrar una solución no se corta la búsqueda. El problema pide la mínima cantidad de pulsaciones, así que se recorren todas las ramas factibles y se guarda la mejor. Si ninguna llega a ser solución, se devuelve -1.
@@ -33,7 +33,7 @@ A diferencia del esquema general, al encontrar una solución no se corta la bús
 
 Una vez elegido $f[0]$ todo queda forzado: el árbol tiene a lo sumo 2 ramas completas, en lugar de las $2^{2n}$ combinaciones de la fuerza bruta.
 
-Como el orden es fijo, `decisiones` guarda los botones en ese orden: `decisiones[0]` es $f[0]$, `decisiones[1 + j]` es $c[j]$ y `decisiones[n + i]` es $f[i]$. Su largo indica qué botón toca decidir.
+Como el orden es fijo, decisiones guarda los botones en ese orden: decisiones[0] es $f[0]$, decisiones[1 + j] es $c[j]$ y decisiones[n + i] es $f[i]$. Su largo indica qué botón toca decidir.
 
 ## Código
 
@@ -168,7 +168,7 @@ El total es $O(n^2)$, que no se puede mejorar porque hay que mirar las $n^2$ luc
 ### Espacial
 $O(n^2)$
 
-El tablero ocupa $O(n^2)$. El arreglo `decisiones` y la [[stack|pila]] de recursión, de profundidad $2n$, ocupan $O(n)$. No se copia el tablero.
+El tablero ocupa $O(n^2)$. El arreglo decisiones y la [[stack|pila]] de recursión, de profundidad $2n$, ocupan $O(n)$. No se copia el tablero.
 
 ## Cuándo usar esta técnica
 
