@@ -148,7 +148,7 @@ El espacio adicional es $O(n^2)$ por la copia del tablero, y el total también e
 
 ### Contexto favorable
 
-- **Cuando $n$ es chico.** Por ejemplo, con $n = 10$ hay $1.048.576$ combinaciones (ya que es $2^{20}$) y cada una revisa 100 luces, lo que da unos 100 millones de operaciones.
+- **Cuando $n$ es chico.** Por ejemplo, con $n = 4$, como en el ejemplo, hay $256$ combinaciones (ya que es $2^{8}$) y cada una revisa 16 luces, lo que da unas $4.096$ operaciones.
 - **Cuando se busca la solución más simple de escribir y de probar.** No hay que decidir un orden de los botones ni diseñar podas. Se generan todas las combinaciones y cada una se simula sobre una copia del tablero, tal como lo haría una persona a mano.
 - **Para verificar otra solución.** Como revisa todas las combinaciones, sirve como referencia: se generan tableros aleatorios chicos y se comparan sus respuestas.
 
@@ -159,15 +159,15 @@ El espacio adicional es $O(n^2)$ por la copia del tablero, y el total también e
 
 ### Comparación con backtracking
 
-Las dos técnicas recorren el mismo espacio de decisiones: cada botón se presiona o no. La diferencia es cuándo verifican. La fuerza bruta arma la combinación completa y recién después la revisa. El backtracking decide los botones de a uno y verifica sobre la marcha. En cuanto una luz con su fila y su columna ya decididas queda apagada, descarta toda la rama sin completarla. También puede descartar una rama cuando las pulsaciones acumuladas ya no pueden mejorar el mínimo.
+Las dos técnicas recorren el mismo espacio de decisiones: cada botón se presiona o no. La diferencia es cuándo verifican. La fuerza bruta arma la combinación completa y recién después la revisa. El backtracking decide los botones de a uno y verifica sobre la marcha. En cuanto una luz con su fila y su columna ya decididas queda apagada, descarta toda la rama sin completarla.
 
 | | Fuerza bruta | Backtracking |
 |---|---|---|
 | Cuándo verifica | Al final, con la combinación completa | Durante la construcción, en cada decisión |
 | Candidatos explorados | Siempre $2^{2n}$ | A lo sumo 2 ramas completas |
 | Tiempo | $O(2^{2n} \cdot n^2)$ | $O(n^2)$ con el orden elegido (primero $f[0]$, después las columnas y por último las filas) |
-| Espacio adicional | $O(n^2)$ por la copia del tablero | $O(n)$ para $f$, $c$ y la [[stack|pila]] de recursión |
-| Dificultad de implementación | Baja | Media: hay que elegir el orden de los botones y las podas |
+| Espacio adicional | $O(n^2)$ por la copia del tablero | $O(n)$ para el arreglo de decisiones y la [[stack|pila]] de recursión |
+| Dificultad de implementación | Baja | Media: hay que elegir el orden de los botones y la poda |
 | Sirve para $n \le 1000$ | No | Sí |
 
 En resumen, la fuerza bruta conviene para $n$ chico o como referencia para verificar. El backtracking, con el orden de decisión elegido, resuelve el problema completo hasta $n = 1000$, porque descarta de inmediato las opciones que dejan una luz apagada. Los detalles están en [[cubo-de-luces-backtracking|la solución por backtracking]].

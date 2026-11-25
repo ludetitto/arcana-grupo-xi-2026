@@ -38,7 +38,10 @@ Como el orden es fijo, decisiones guarda los botones en ese orden: decisiones[0]
 ## Código
 
 ```python
+import sys
+
 def minimo_pulsaciones_botones(n, matriz):
+    sys.setrecursionlimit(10_000)         # la recursión llega a 2n niveles (hasta 2000)
     mejor = float('inf')
 
     def es_factible(decisiones, x):
@@ -68,59 +71,65 @@ def minimo_pulsaciones_botones(n, matriz):
 
 ## Traza de ejemplo
 
-### Caso con solución
+### Caso del ejemplo
 
-Matriz inicial de $3 \times 3$:
-
-```
-0 1 1
-1 0 0
-0 1 1
-```
-
-**Rama $f[0] = 0$.** No se pulsa la fila 0. La luz $(0, 0)$ está apagada, así que solo es factible $c[0] = 1$. Las luces $(0, 1)$ y $(0, 2)$ están encendidas, así que solo son factibles $c[1] = 0$ y $c[2] = 0$. Se pulsa la columna 0:
+Matriz inicial de $4 \times 4$, la del [[cubo-de-luces|ejemplo concreto]]:
 
 ```
-1 1 1
-0 0 0
-1 1 1
+0 1 1 0
+1 0 0 1
+1 0 0 1
+0 1 1 0
 ```
 
-La fila 1 está toda apagada: $f[1] = 0$ no es factible y solo sirve $f[1] = 1$. Se pulsa la fila 1:
+**Rama $f[0] = 0$.** No se pulsa la fila 0. Las luces $(0, 0)$ y $(0, 3)$ están apagadas, así que solo son factibles $c[0] = 1$ y $c[3] = 1$. Las luces $(0, 1)$ y $(0, 2)$ están encendidas, así que solo son factibles $c[1] = 0$ y $c[2] = 0$. Se pulsan las columnas 0 y 3:
 
 ```
-1 1 1
-1 1 1
-1 1 1
+1 1 1 1
+0 0 0 0
+0 0 0 0
+1 1 1 1
 ```
 
-La fila 2 ya está encendida: solo sirve $f[2] = 0$. Es solución con 2 pulsaciones y el mínimo pasa de $\infty$ a 2. Se borran las decisiones y se vuelve atrás hasta $f[0]$.
+Las filas 1 y 2 están todas apagadas: solo sirven $f[1] = 1$ y $f[2] = 1$. Se pulsan:
+
+```
+1 1 1 1
+1 1 1 1
+1 1 1 1
+1 1 1 1
+```
+
+La fila 3 ya está encendida: solo sirve $f[3] = 0$. Es solución con 4 pulsaciones (columnas 0 y 3, filas 1 y 2) y el mínimo pasa de $\infty$ a 4. Se borran las decisiones y se vuelve atrás hasta $f[0]$.
 
 **Rama $f[0] = 1$.** Se pulsa la fila 0:
 
 ```
-1 0 0
-1 0 0
-0 1 1
+1 0 0 1
+1 0 0 1
+1 0 0 1
+0 1 1 0
 ```
 
-Ahora la fila 0 fuerza $c = [0, 1, 1]$. Se pulsan las columnas 1 y 2:
+Ahora la fila 0 fuerza $c = [0, 1, 1, 0]$. Se pulsan las columnas 1 y 2:
 
 ```
-1 1 1
-1 1 1
-0 0 0
+1 1 1 1
+1 1 1 1
+1 1 1 1
+0 0 0 0
 ```
 
-La fila 1 fuerza $f[1] = 0$ y la fila 2 fuerza $f[2] = 1$. Se pulsa la fila 2:
+Las filas 1 y 2 fuerzan $f[1] = 0$ y $f[2] = 0$, y la fila 3 fuerza $f[3] = 1$. Se pulsa la fila 3:
 
 ```
-1 1 1
-1 1 1
-1 1 1
+1 1 1 1
+1 1 1 1
+1 1 1 1
+1 1 1 1
 ```
 
-Es solución con 4 pulsaciones, que no mejora el mínimo. El algoritmo devuelve 2 tras 13 llamadas, contra los $2^6 = 64$ candidatos de la fuerza bruta.
+Es solución con 4 pulsaciones (filas 0 y 3, columnas 1 y 2), que no mejora el mínimo. El algoritmo devuelve 4 tras 17 llamadas, contra los $2^8 = 256$ candidatos de la fuerza bruta.
 
 ### Caso sin solución
 
